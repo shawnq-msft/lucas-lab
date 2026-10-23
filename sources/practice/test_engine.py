@@ -78,7 +78,7 @@ class Tests(unittest.TestCase):
     def test_catalog_has_metadata_and_no_answers(self):
         self.assertIsNotNone(engine,'Missing playable Python simulation engine')
         c=engine.catalog()
-        self.assertEqual(len(c),6)
+        self.assertEqual(len(c),10)
         for q in c:
             self.assertIn('starter',q)
             self.assertIn('hints',q)

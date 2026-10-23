@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {topics,makeLesson,judge} from '../algorithms/model.mjs';
-test('six topics generate valid demos and answerable exercises',()=>{
- assert.equal(topics.length,6);
+test('all topics generate valid demos and answerable exercises',()=>{
+ assert.ok(topics.length>=16);
  for(let seed=1;seed<30;seed++) for(const topic of topics){
   const l=makeLesson(topic.id,seed);
   assert.ok(l.frames.length>=3,topic.id);

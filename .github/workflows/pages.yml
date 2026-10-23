@@ -23,7 +23,9 @@ jobs:
           python3 build.py
           python3 -m unittest discover -s tests -p test_build.py -v
           python3 -m unittest discover -s sources/practice -p test_engine.py -v
-          node --test tests/model.test.mjs
+          python3 -m unittest discover -s sources/practice -p test_advanced.py -v
+          node --test tests/model.test.mjs tests/advanced.test.mjs
+          python3 -m unittest discover -s tests -p test_algorithm_python.py -v
       - uses: actions/configure-pages@v5
       - name: Stage public site only
         run: |

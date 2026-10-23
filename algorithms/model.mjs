@@ -1,3 +1,5 @@
+import {advancedTopics,makeAdvancedLesson} from './advanced.mjs';
+export {sortTrace,recursionTrace,treeTrace,stoneTrace,minimaxTrace} from './advanced.mjs';
 export const topics=[
  {id:'array',title:'数组',subtitle:'按门牌找矿石',idea:'数组像一排带门牌的储物格。Python 列表的第一个位置编号是 0。',python:'stones = [12, 25, 38]\nprint(stones[1])  # 第二格：25',cost:'知道位置，就直接找到那一格；不必从头检查。'},
  {id:'stack',title:'栈',subtitle:'最后放，最先拿',idea:'像一叠盘子，只能从顶端放入或取走。最后放进去的，最先出来。',python:'bag = []\nbag.append("铜矿")\nbag.append("银矿")\nprint(bag.pop())  # 银矿',cost:'入栈、出栈只操作顶端，不用移动其他盘子。'},
@@ -5,10 +7,11 @@ export const topics=[
  {id:'binary',title:'二分查找',subtitle:'每次排除一半',idea:'先排好序，再比较中间的一格。目标更大就去右半边，更小就去左半边。',python:'lo, hi = 0, len(stones) - 1\nmid = (lo + hi) // 2\n# 比较 stones[mid] 和目标\n# 更小：lo = mid + 1；更大：hi = mid - 1',cost:'前提：已经有序。每次大约剩一半；无序数据不能照搬。'},
  {id:'bubble',title:'冒泡排序',subtitle:'相邻比较，把大数送右边',idea:'从左往右比较相邻两个数。左边大就交换；一轮后，最大的数到最右边。',python:'for end in range(len(stones)-1, 0, -1):\n    for i in range(end):\n        if stones[i] > stones[i+1]:\n            stones[i], stones[i+1] = stones[i+1], stones[i]',cost:'简单但比较次数多。这里用来理解排序，不是大数据最快的方法。'},
  {id:'bfs',title:'广度优先搜索',subtitle:'一圈一圈探索',idea:'用队列存待探索的地点。先看近邻，再看更远一层；入队就标记，避免重复。',python:'queue = deque(["A"])\nseen = {"A"}\nwhile queue:\n    place = queue.popleft()\n    for neighbor in graph[place]:\n        if neighbor not in seen:\n            seen.add(neighbor)\n            queue.append(neighbor)',cost:'在每条边长度相同的图里，可以找最少步数路线；不是任意带权图的最短路算法。'}
-];
+].map(t=>({...t,stars:t.id==='bfs'?2:1})).concat(advancedTopics);
 const graph={A:['B','C'],B:['A','D','E'],C:['A','F'],D:['B'],E:['B'],F:['C']};
 export function judge(exercise,value){return exercise.answer===value;}
 export function makeLesson(id,seed=1){
+ const advanced=makeAdvancedLesson(id,seed);if(advanced)return advanced;
  const topic=topics.find(t=>t.id===id);if(!topic)throw Error('Unknown topic');
  let s=seed>>>0;const rand=n=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s%n;};
  let data=Array.from({length:5},(_,i)=>10+i*10+rand(8)),frames=[],exercise,target,order=[];

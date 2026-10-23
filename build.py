@@ -6,7 +6,8 @@ ROOT=Path(__file__).resolve().parent
 src=ROOT/'sources/practice'
 spec=importlib.util.spec_from_file_location('quest_engine',src/'engine.py')
 engine=importlib.util.module_from_spec(spec);spec.loader.exec_module(engine)
-payload={'levels':engine.catalog(),'engine':(src/'engine.py').read_text(),'initial':{str(n)+':'+str(v):engine.evaluate(n,'',v)['trace'][0] for n in range(1,7) for v in (0,1)}}
+levels=engine.catalog()
+payload={'levels':levels,'engine':(src/'engine.py').read_text(),'initial':{str(l['id'])+':'+str(v):engine.evaluate(l['id'],'',v)['trace'][0] for l in levels for v in (0,1)}}
 text=(src/'template.html').read_text()
 assert text.count('__PAYLOAD__')==1
 text=text.replace('__PAYLOAD__',json.dumps(payload,ensure_ascii=False).replace('</','<\\/'))
