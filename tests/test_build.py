@@ -11,9 +11,10 @@ class SiteBuild(unittest.TestCase):
         self.assertIn('lucas-lab-python-quest-v1',text)
         for name in ['pyodide.js','pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json']:
             self.assertTrue((ROOT/'practice/runtime'/name).is_file(),name)
-    def test_home_describes_ten_practice_levels(self):
+    def test_home_describes_three_practice_groups(self):
         text=(ROOT/'index.html').read_text()
-        self.assertIn('六关基础 + 四道提高题',text)
+        for label in ['第一组：基础六关','第二组：综合四题','第三组：算法拓展四题','A/B题目版本']:
+            self.assertIn(label,text)
     def test_home_describes_graded_advanced_algorithms(self):
         text=(ROOT/'index.html').read_text()
         for label in ['★', '归并', '快速', '堆排序', '递归', '二叉树', '博弈']:

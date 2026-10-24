@@ -59,8 +59,8 @@ def bfs(maze, start, goal):
                 seen.add(q);queue.append((q,path+[q]))
 
 class AdvancedTests(unittest.TestCase):
-    def test_catalog_exactly_ten_and_stars(self):
-        c=engine.catalog()
+    def test_original_catalog_preserved_and_stars(self):
+        c=[x for x in engine.catalog() if x['id']<=10]
         self.assertEqual([x['id'] for x in c],list(range(1,11)))
         self.assertEqual([x['stars'] for x in c[6:]],[2,3,2,3])
         for item in c[6:]:

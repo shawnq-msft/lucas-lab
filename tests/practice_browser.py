@@ -6,8 +6,9 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'sources/practice'))
 from test_engine import SOLUTIONS
 from test_advanced import ADVANCED_SOLUTIONS, bfs
+from test_combinations import COMBINATION_SOLUTIONS
 import engine
-SOLUTIONS={**SOLUTIONS,**ADVANCED_SOLUTIONS}
+SOLUTIONS={**SOLUTIONS,**COMBINATION_SOLUTIONS,**ADVANCED_SOLUTIONS}
 LEVELS=engine.catalog()
 BASE=os.environ.get('LAB_URL','http://127.0.0.1:8786/')
 results=[]
@@ -25,8 +26,14 @@ with sync_playwright() as pw:
     page.goto(BASE+'practice/')
     page.wait_for_function("document.querySelector('#runtime').dataset.state==='ready'",timeout=180000)
     check('local Python runtime ready',True)
-    check('catalog has ten levels',page.locator('#levels button').count()==len(LEVELS)==10)
-    check('expandable higher category',page.locator('#higher summary').inner_text().startswith('提高'))
+    check('catalog has fourteen levels',page.locator('#levels button').count()==len(LEVELS)==14)
+    check('three clear groups',page.locator('#levels > details').count()==3)
+    check('first and second groups open',page.locator('#basic').get_attribute('open') is not None and page.locator('#composition').get_attribute('open') is not None)
+    check('third group default collapsed',page.locator('#higher').get_attribute('open') is None)
+    check('navigation catalog order',page.locator('#levels button').evaluate_all('(els)=>els.map(e=>Number(e.dataset.id))')==[q['id'] for q in LEVELS])
+    check('composition local numbering',page.locator('#composition .num').all_text_contents()==['01','02','03','04'])
+    check('variant is not a group',page.locator('label[for="variant"]').inner_text()=='题目版本' and page.locator('#variant option').all_text_contents()==['A 初次','B 换题'])
+    check('expandable higher category','第三组' in page.locator('#higher summary').inner_text())
     page.locator('#higher summary').click()
     check('higher category opens',page.locator('#higher').get_attribute('open') is not None)
     check('star ratings',page.locator('#levels button[data-id="8"]').inner_text().count('★')==3)
@@ -49,6 +56,7 @@ with sync_playwright() as pw:
     # Use CPython's independent oracle for wrong-variant results, not engine answers.
     wrong_path=bfs(engine.World(8,0).maze,engine.World(8,0).start,engine.World(8,0).goal)
     failures={7:['for coin in coins:\n    goto(coin)',ADVANCED_SOLUTIONS[7].replace(' > ',' >= '),'for coin in sorted(coins):\n    goto(coin)'],8:['submit(None)','submit([start,goal])','submit('+repr(wrong_path)+')'],9:["submit(['A','B','D','E','C','F'])",ADVANCED_SOLUTIONS[9].replace('order.append(node)','order.append(root)')],10:['submit(True)','submit(-1)','submit(1)']}
+    failures.update({11:[COMBINATION_SOLUTIONS[11].replace(' >= limit',' > limit'),COMBINATION_SOLUTIONS[11].replace(' == 1',' >= 1')],12:[COMBINATION_SOLUTIONS[12].replace(' < hygeia',' <= hygeia'),COMBINATION_SOLUTIONS[12].replace(' <= limit',' < limit')],13:[COMBINATION_SOLUTIONS[13].replace('goto(exitTarget)',''),COMBINATION_SOLUTIONS[13].replace('.lower()','')],14:[COMBINATION_SOLUTIONS[14].replace(' <= maxDistance',' < maxDistance'),COMBINATION_SOLUTIONS[14].replace(' < hygeia',' <= hygeia')]})
     for n,codes in failures.items():
         page.locator(f'#levels button[data-id="{n}"]').click()
         for code in codes:
@@ -68,7 +76,7 @@ with sync_playwright() as pw:
     page.locator('svg .actor').first.click();check('object inspection visible',bool(page.locator('#inspect').inner_text()))
     with page.expect_download() as dl:page.locator('#export').click()
     dest=ROOT/'verification/practice-progress.json';dl.value.save_as(dest);data=json.loads(dest.read_text())
-    check('all twenty level records exported',all(data['records'][f'{i}:{v}']['attempts'] for i in SOLUTIONS for v in [0,1]))
+    check('all twenty eight level records exported',len(data['records'])==28 and all(data['records'][f'{i}:{v}']['attempts'] for i in SOLUTIONS for v in [0,1]))
     check('first advanced solutions retained',all(data['records'][f'{i}:{v}']['attempts'][0]['code']==SOLUTIONS[i] for i in range(7,11) for v in [0,1]))
     check('hints exported',any(r['hints']>0 for r in data['records'].values()))
     check('first and failed attempts retained',len(data['records']['1:0']['attempts'])>=4)
@@ -77,11 +85,11 @@ with sync_playwright() as pw:
     page.screenshot(path=str(ROOT/'verification/practice-desktop.png'),full_page=True)
     page.set_viewport_size({'width':390,'height':844})
     check('practice mobile fits viewport',page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
-    page.locator('#higher summary').click()
-    for n in range(7,11):
+    if page.locator('#higher').get_attribute('open') is None:page.locator('#higher summary').click()
+    for n in [11,12,13,14,7,8,9,10]:
         page.locator(f'#levels button[data-id="{n}"]').click()
-        check(f'advanced {n} mobile fits',page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
-        check(f'advanced {n} custom API visible','非官方' in page.locator('#goal').inner_text())
+        check(f'level {n} mobile fits',page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
+        check(f'level {n} self made notice visible','自制' in page.locator('#goal').inner_text() if n>=11 else '非官方' in page.locator('#goal').inner_text())
     page.screenshot(path=str(ROOT/'verification/practice-mobile.png'),full_page=True)
     check('home navigation',page.locator('a[href="../"]').count()>0)
     check('no JavaScript errors',not errors);check('no failed HTTP responses',not failed)
@@ -93,6 +101,19 @@ with sync_playwright() as pw:
     check('legacy hint history preserved','已看提示 2 条' in old.locator('#attemptInfo').inner_text())
     check('legacy first submission preserved',old.evaluate("JSON.parse(localStorage.getItem('lucas-lab-python-quest-v1')).records['4:1'].attempts[0].code")=='# first answer')
     legacy.close()
+    advanced=browser.new_context()
+    advanced.add_init_script("if(!localStorage.getItem('lucas-lab-python-quest-v1'))localStorage.setItem('lucas-lab-python-quest-v1',JSON.stringify({selected:7,variant:0,records:{'7:0':{code:'# old advanced answer',seconds:83,hints:1,attempts:[{code:'# original first answer',passed:false,hints:0,seconds:11}]}}}));")
+    old=advanced.new_page();old.goto(BASE+'practice/');old.wait_for_selector('#editor')
+    check('old 7:0 selected code preserved',old.locator('#editor').input_value()=='# old advanced answer')
+    check('resumed advanced group opens',old.locator('#higher').get_attribute('open') is not None)
+    old.locator('#levels button[data-id="11"]').click();old.locator('#editor').fill('# new composition answer')
+    old.reload();old.wait_for_selector('#editor')
+    check('new composition selected code preserved',old.locator('#editor').input_value()=='# new composition answer')
+    check('third group collapsed after resume composition',old.locator('#higher').get_attribute('open') is None)
+    old.locator('#higher summary').click();old.locator('#levels button[data-id="7"]').click()
+    check('old advanced answer untouched after new exercise',old.locator('#editor').input_value()=='# old advanced answer')
+    check('old 7:0 first attempt hints and time preserved',old.evaluate("(()=>{const r=JSON.parse(localStorage.getItem('lucas-lab-python-quest-v1')).records['7:0'];return r.attempts[0].code==='# original first answer'&&r.hints===1&&r.seconds>=83})()"))
+    advanced.close()
     browser.close()
 report={'base':BASE,'passed':len(results),'checks':results,'errors':errors,'failedResponses':failed}
 (ROOT/'verification/practice-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False,indent=2))
