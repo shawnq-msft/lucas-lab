@@ -25,14 +25,14 @@ jobs:
           python3 -m unittest discover -s sources/practice -p test_engine.py -v
           python3 -m unittest discover -s sources/practice -p test_advanced.py -v
           python3 -m unittest discover -s sources/practice -p test_combinations.py -v
-          node --test tests/model.test.mjs tests/advanced.test.mjs
+          node --test tests/model.test.mjs tests/advanced.test.mjs tests/typing.test.mjs
           python3 -m unittest discover -s tests -p test_algorithm_python.py -v
       - uses: actions/configure-pages@v5
       - name: Stage public site only
         run: |
           mkdir _site
           cp index.html styles.css favicon.svg .nojekyll _site/
-          cp -r practice algorithms tokamak _site/
+          cp -r practice algorithms tokamak typing _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

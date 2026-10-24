@@ -19,6 +19,13 @@ class SiteBuild(unittest.TestCase):
         text=(ROOT/'index.html').read_text()
         for label in ['★', '归并', '快速', '堆排序', '递归', '二叉树', '博弈']:
             with self.subTest(label=label):self.assertIn(label,text)
+    def test_typing_has_home_entry_and_deploy_staging(self):
+        home=(ROOT/'index.html').read_text()
+        self.assertIn('href="typing/"',home)
+        self.assertIn('Cookie',home)
+        for scene in ['星矿补给站','太空防御','星际修桥']:
+            self.assertIn(scene,home)
+        self.assertIn('tokamak typing _site/',(ROOT/'.github/workflows/pages.yml').read_text())
     def test_integrated_modules_have_home_link(self):
         for name in ['practice','tokamak']:
             self.assertIn('href="../"',(ROOT/name/'index.html').read_text())
