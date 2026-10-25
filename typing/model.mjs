@@ -1,83 +1,26 @@
-export const scenes={supply:{label:'星矿补给站'},defense:{label:'太空防御'},bridge:{label:'星际修桥'}};
-export const modes={
- words:{label:'英语起步',items:['cat','dog','sun','moon','book','tree','fish','bird','happy','apple','green','hello']},
- python:{label:'Python 关键词',items:['if','else','for','in','while','def','return','print','input','range','True','False']},
- symbols:{label:'代码表达式',items:['x = 1','print(x)','a[0]','x + 2','len(a)','x == 3','a = [1, 2]','print("hi")','x != 0']}
-};
-for(const m of Object.values(modes))m.text=m.items.join(' ');
-// Count inserted/replaced characters, not deletions. Errors remain after correction.
-function countEdit(owner,value,target){
- let p=0;while(p<value.length&&p<owner.value.length&&value[p]===owner.value[p])p++;
- let s=0;while(s<value.length-p&&s<owner.value.length-p&&value.at(-1-s)===owner.value.at(-1-s))s++;
- for(let i=p;i<value.length-s;i++){owner.attempts++;if(value[i]===target[i])owner.hits++;}
- owner.value=value;
-}
-export class Run{
- constructor(target,duration){Object.assign(this,{target,duration,started:null,done:false,value:'',attempts:0,hits:0});}
- remaining(now){return this.started===null?this.duration:Math.max(0,Math.ceil((this.started+this.duration*1000-now)/1000));}
- update(value,now){if(this.done)return null;if(this.started!==null&&now>=this.started+this.duration*1000)return this.finish(now);value=value.slice(0,this.target.length);if(value===this.value)return null;if(this.started===null&&value.length)this.started=now;countEdit(this,value,this.target);return value===this.target?this.finish(now,true):null;}
- finish(now,complete=false){if(this.done||this.started===null||(!complete&&now<this.started+this.duration*1000))return null;this.done=true;const elapsed=Math.max(1,Math.min(this.duration,(now-this.started)/1000)),correct=[...this.value].filter((c,i)=>c===this.target[i]).length;return {elapsed,wpm:Math.round(correct/5/(elapsed/60)*10)/10,accuracy:this.attempts?Math.round(this.hits/this.attempts*100):0};}
-}
-// Pausing freezes active time and permanently removes leaderboard eligibility.
+export const scenes={supply:{label:'星矿补给站',en:'ORBITAL SUPPLY'},defense:{label:'太空防御',en:'PLANET DEFENSE'},assault:{label:'星际反击',en:'MOTHERSHIP ASSAULT'}};
+export const modes={words:{label:'英语单词',items:'cat dog sun moon star sky blue red green gold silver rocket comet orbit planet space light night cloud rain wind snow lake river ocean hill forest leaf tree flower seed apple lemon peach grape bread water milk happy brave kind quick calm bright small big soft warm cool open close jump run walk swim read write play learn dream build help hello world friend team ship pilot cargo robot laser shield'.split(' '),phrases:['reach the stars','keep our planet safe','we fly as a team','bring the cargo home','a brave little pilot','follow the bright comet','ready for a new mission','the stars shine tonight']},python:{label:'Python 关键词',items:['if','else','elif','for','in','while','def','return','print','input','range','True','False','None','and','or','not','class','import','from','as','with','try','except','finally','break','continue','pass','yield','lambda','global','assert','list','dict','tuple','set','int','str','float','bool','len','sum','min','max','sorted','enumerate','zip','append','extend','items','keys','values'],phrases:['for x in range(5):','if score > 10:','return True','print("hello")','while ready:','import random','for item in cargo:']},symbols:{label:'代码表达式',items:['x = 1','print(x)','a[0]','x + 2','len(a)','x == 3','a = [1, 2]','print("hi")','x != 0','n += 1','x < 10','x > 0','a + b','n * 2','n / 2','x % 3','a[-1]','len(ship)','hp -= 1','x <= 5','n >= 0','[1, 2, 3]','sum(a)','max(a)','min(a)','a.append(1)','list(range(3))','x ** 2'],phrases:['score = score + 10','print("mission ready")','cargo.append("ore")','shield = max(0, hp - 1)','if x == 3: print(x)']}};
+export function random(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296;}return Math.random();}
+export class ShuffleBag{constructor(items,rng=random){if(!items?.length)throw Error('Empty bag');this.items=[...items];this.rng=rng;this.bag=[];this.last=null;}next(){if(!this.bag.length){this.bag=[...this.items];for(let i=this.bag.length-1;i>0;i--){const j=Math.min(i,Math.max(0,Math.floor(this.rng()*(i+1))));[this.bag[i],this.bag[j]]=[this.bag[j],this.bag[i]];}if(this.bag.length>1&&this.bag.at(-1)===this.last)[this.bag[0],this.bag[this.bag.length-1]]=[this.bag.at(-1),this.bag[0]];}return this.last=this.bag.pop();}}
 export class Game{
- constructor(scene,mode,duration){
-  if(!Object.hasOwn(scenes,scene)||!Object.hasOwn(modes,mode)||![30,60].includes(duration))throw new Error('Invalid game');
-  Object.assign(this,{scene,mode,duration,started:null,pausedAt:null,pausedTotal:0,eligible:true,done:false,value:'',attempts:0,hits:0,correct:0,completed:0,progress:0,index:0,shield:3,enemies:[],laser:null,nextSpawn:5000,serial:0});
-  if(scene==='defense')this.spawn(0);
- }
+ constructor(scene,mode,duration,options={}){const speed=typeof options==='number'?options:options.speed??20;if(!Object.hasOwn(scenes,scene)||!Object.hasOwn(modes,mode)||![30,60].includes(duration)||!Number.isInteger(speed)||speed<5||speed>60)throw Error('Invalid game');Object.assign(this,{scene,mode,duration,speed,started:null,pausedAt:null,pausedTotal:0,eligible:true,done:false,value:'',attempts:0,hits:0,correct:0,completed:0,progress:0,shield:3,combo:0,score:0,bossHP:100,bossDefeated:0,wave:1,serial:0,events:[],enemies:[],nextSpawn:0,formationSerial:0,groups:new Map()});this.bag=new ShuffleBag(modes[mode].items,options.rng);this.phrases=new ShuffleBag(modes[mode].phrases,options.rng);this.spawn(0);}
  elapsed(now){return this.started===null?0:Math.max(0,(this.pausedAt??now)-this.started-this.pausedTotal);}
  remaining(now){return Math.max(0,Math.ceil(this.duration-this.elapsed(now)/1000));}
- get target(){return this.scene==='defense'?(this.enemies[0]?.text||''):modes[this.mode].items[this.index%modes[this.mode].items.length];}
- spawn(at){const n=this.serial++;this.enemies.push({id:n,text:modes[this.mode].items[n%modes[this.mode].items.length],born:at,life:Math.max(9000,14000-n*250),x:18+(n%3)*30});}
- step(now){
-  if(this.done||this.started===null||this.pausedAt!==null)return null;
-  const t=Math.min(this.duration*1000,this.elapsed(now));
-  if(this.scene==='defense'){
-   const missed=this.enemies.filter(e=>t-e.born>=e.life);
-   if(missed.length){this.shield=Math.max(0,this.shield-missed.length);this.enemies=this.enemies.filter(e=>!missed.includes(e));this.value='';}
-   if(this.shield===0)return this.finish(now,'shield');
-   // One fresh spawn at current elapsed time, never a timestamp catch-up flood.
-   if(t>=this.nextSpawn&&t<this.duration*1000){if(this.enemies.length<3)this.spawn(t);this.nextSpawn=t+Math.max(4000,5500-this.serial*80);}
-  }
-  return this.elapsed(now)>=this.duration*1000?this.finish(now,'time'):null;
- }
- input(value,now){
-  if(this.done||this.pausedAt!==null)return null;
-  const end=this.step(now);if(end)return end;
-  if(!this.target)return null;
-  value=value.slice(0,120);if(value===this.value)return null;
-  if(this.started===null&&value.length)this.started=now;
-  countEdit(this,value,this.target);
-  if(value===this.target){this.correct+=value.length;this.completed++;this.progress++;this.index++;
-   if(this.scene==='defense'){const e=this.enemies.shift();this.laser={...e,at:this.elapsed(now),y:12+68*Math.min(1,(this.elapsed(now)-e.born)/e.life)};}
-   this.value='';
-  }
-  return null;
- }
+ difficulty(at=0){return 1+Math.min(1.1,at/90000+this.completed/35);}
+ travelTime(length,at=0){return Math.max(8000,(length*12000/this.speed+6500)/this.difficulty(at));}
+ get target(){return this.enemies[0]?.text??'';}
+ emit(type,data={}){const event={...data,type,id:(this.eventSerial??0)+1};this.eventSerial=event.id;this.events.push(event);if(this.events.length>80)this.events.shift();return event;}
+ spawn(at){if(this.enemies.length>=3)return;let texts,formation=null;const phrase=this.completed>=3&&(this.completed%3===0||at>20000);if(phrase&&this.scene==='defense'){texts=this.phrases.next().split(' ');formation=++this.formationSerial;this.groups.set(formation,{remaining:texts.length,perfect:true});}else texts=[phrase?this.phrases.next():this.bag.next()];const total=texts.join(' ').length;for(let i=0;i<texts.length;i++){const id=this.serial++;this.enemies.push({id,text:texts[i],born:at,life:this.travelTime(total,at)+(formation?i*2500:0),x:formation?50:30+(id%3)*20,formation,order:i,total:texts.length,large:texts[i].length>10});}this.nextSpawn=at+Math.max(9000,this.travelTime(total,at)*0.8);}
+ step(now){if(this.done||this.started===null||this.pausedAt!==null)return null;const t=Math.min(this.duration*1000,this.elapsed(now));if(this.elapsed(now)>=this.duration*1000)return this.finish(now,'time');const missed=this.enemies.filter(e=>t-e.born>=e.life);if(missed.length){for(const e of missed){if(e.formation)this.groups.get(e.formation).perfect=false;this.emit('miss',{...e,at:t});}this.enemies=this.enemies.filter(e=>!missed.includes(e));this.value='';this.combo=0;if(this.scene!=='supply')this.shield=Math.max(0,this.shield-missed.length);if(this.shield===0)return this.finish(now,'shield');}if(!this.enemies.length)this.spawn(t);else if(t>=this.nextSpawn&&!this.enemies.some(e=>e.formation)&&this.enemies.length<2)this.spawn(t);if(!this.value&&!this.enemies.some(e=>e.formation))this.enemies.sort((a,b)=>(a.born+a.life)-(b.born+b.life));return null;}
+ input(value,now){if(this.done||this.pausedAt!==null)return null;const end=this.step(now);if(end)return end;if(typeof value!=='string'||!value.startsWith(this.value)||value.length!==this.value.length+1||!/^[\x20-\x7e]+$/.test(value)||!this.target)return null;if(this.started===null)this.started=now;const index=this.value.length,ch=value.at(-1);this.attempts++;if(ch===this.target[index])this.hits++;this.value=value;if(value.length===this.target.length){const enemy=this.enemies[0],at=this.elapsed(now);if(value!==enemy.text){this.combo=0;if(enemy.formation)this.groups.get(enemy.formation).perfect=false;this.emit('error',{...enemy,at});this.value='';return null;}this.correct+=value.length;this.completed++;this.progress++;this.combo++;this.score+=Math.round(value.length*10*(1+Math.min(10,this.combo-1)*.1));this.enemies.shift();this.emit({supply:'load',defense:'laser',assault:'missile'}[this.scene],{...enemy,at});if(enemy.formation){const group=this.groups.get(enemy.formation);if(--group.remaining===0){if(group.perfect){this.score+=150;this.emit('formation',{at});}this.groups.delete(enemy.formation);}}if(this.scene==='assault'){this.bossHP=Math.max(0,this.bossHP-(enemy.large?40:25));if(this.bossHP===0){this.bossDefeated++;this.score+=300;this.emit('boss',{at});this.wave++;this.bossHP=100;}}this.value='';if(!this.enemies.length)this.spawn(at);}return null;}
  pause(now){if(this.done||this.started===null||this.pausedAt!==null)return null;const end=this.step(now);if(end)return end;this.pausedAt=now;this.eligible=false;return null;}
- resume(now){if(this.pausedAt!==null){this.pausedTotal+=now-this.pausedAt;this.pausedAt=null;}}
- finish(now,reason){
-  if(this.done||this.started===null)return null;this.done=true;
-  const elapsed=Math.max(1,Math.min(this.duration,this.elapsed(now)/1000));
-  const correct=this.correct+[...this.value].filter((c,i)=>c===this.target[i]).length;
-  return {reason,elapsed,wpm:Math.min(2000,Math.round(correct/5/(elapsed/60)*10)/10),accuracy:this.attempts?Math.round(this.hits/this.attempts*100):0,eligible:this.eligible,completed:this.completed};
- }
+ resume(now){if(this.pausedAt!==null){this.pausedTotal+=Math.max(0,now-this.pausedAt);this.pausedAt=null;}}
+ stats(now){const elapsed=Math.max(1,Math.min(this.duration,this.elapsed(now)/1000));return {elapsed,wpm:Math.min(2000,Math.round(this.hits/5/(elapsed/60)*10)/10),accuracy:this.attempts?Math.round(this.hits/this.attempts*100):100,completed:this.completed,score:this.score,eligible:this.eligible};}
+ finish(now,reason){if(this.done||this.started===null)return null;this.done=true;return {reason,...this.stats(now)};}
 }
-const sk=Object.keys(scenes),mk=Object.keys(modes);
-const valid=r=>Array.isArray(r)&&r.length===6&&Object.hasOwn(scenes,r[0])&&Object.hasOwn(modes,r[1])&&[30,60].includes(r[2])&&Number.isFinite(r[3])&&r[3]>=0&&r[3]<=2000&&Number.isInteger(r[4])&&r[4]>=0&&r[4]<=100&&Number.isSafeInteger(r[5])&&r[5]>=1577836800000&&r[5]<=4102444800000;
-export function addScore(scores,row){
- const all=[...(Array.isArray(scores)?scores:[]),row].filter(valid),out=[];
- for(const s of sk)for(const m of mk)for(const d of [30,60])out.push(...all.filter(r=>r[0]===s&&r[1]===m&&r[2]===d).sort((a,b)=>b[3]-a[3]||b[4]-a[4]||b[5]-a[5]).slice(0,2));return out;
-}
-export function encodeScores(rows){return encodeURIComponent(JSON.stringify({v:2,r:addScore(rows,null).map(r=>[sk.indexOf(r[0])*6+mk.indexOf(r[1])*2+(r[2]===60?1:0),Math.round(r[3]*10),r[4],Math.floor(r[5]/1000)])}));}
-export function decodeScores(raw){
- try{
-  if(typeof raw!=='string'||raw.length>=3800)return [];
-  const data=JSON.parse(decodeURIComponent(raw));let rows;
-  if(Array.isArray(data)){if(data.length>30)return [];rows=data.map(r=>Array.isArray(r)&&r.length===5?['supply',...r]:null);}
-  else{if(!data||data.v!==2||Object.keys(data).length!==2||!Array.isArray(data.r)||data.r.length>36)return [];
-   rows=data.r.map(r=>{if(!Array.isArray(r)||r.length!==4||!r.every(Number.isSafeInteger)||r[0]<0||r[0]>=18)return null;const k=r[0];return [sk[Math.floor(k/6)],mk[Math.floor(k%6/2)],k%2?60:30,r[1]/10,r[2],r[3]*1000];});}
-  if(!rows.every(valid))return [];return addScore(rows,null);
- }catch{return [];}
-}
+const sk=['supply','defense','assault','bridge'],mk=Object.keys(modes);
+const valid=r=>Array.isArray(r)&&r.length===8&&sk.includes(r[0])&&mk.includes(r[1])&&[30,60].includes(r[2])&&Number.isInteger(r[3])&&(r[3]===0||r[3]>=5&&r[3]<=60)&&(r[0]!=='bridge'||r[3]===0)&&Number.isFinite(r[4])&&r[4]>=0&&r[4]<=2000&&Number.isInteger(r[5])&&r[5]>=0&&r[5]<=100&&Number.isSafeInteger(r[6])&&r[6]>=1577836800000&&r[6]<=4102444800000&&Number.isSafeInteger(r[7])&&r[7]>=0&&r[7]<=10000000;
+export function addScore(scores,row){const all=[...(Array.isArray(scores)?scores:[]),row].filter(valid).sort((a,b)=>b[6]-a[6]),groups=new Map();for(const r of all){const k=r.slice(0,4).join('/');const group=groups.get(k)||[];group.push(r);group.sort((a,b)=>b[7]-a[7]||b[4]-a[4]||b[5]-a[5]||b[6]-a[6]);groups.set(k,group.slice(0,2));}return [...groups.values()].flat().sort((a,b)=>b[6]-a[6]).slice(0,32);}
+export function encodeScores(rows){let data=addScore(rows,null),out;do{out=encodeURIComponent(JSON.stringify({v:3,r:data.map(r=>[sk.indexOf(r[0]),mk.indexOf(r[1]),r[2],r[3],Math.round(r[4]*10),r[5],Math.floor(r[6]/1000),r[7]])}));if(out.length>=3700)data.pop();}while(out.length>=3700);return out;}
+export function decodeScores(raw){try{if(typeof raw!=='string'||raw.length>=3800)return [];const d=JSON.parse(decodeURIComponent(raw));let rows;if(Array.isArray(d)){if(d.length>30)return [];rows=d.map(r=>Array.isArray(r)&&r.length===5?['supply',r[0],r[1],0,r[2],r[3],r[4],0]:null);}else{if(!d||Object.keys(d).sort().join(',')!=='r,v'||!Array.isArray(d.r)||d.r.length>36)return [];if(d.v===3)rows=d.r.map(r=>Array.isArray(r)&&r.length===8&&r.every(Number.isSafeInteger)?[sk[r[0]],mk[r[1]],r[2],r[3],r[4]/10,r[5],r[6]*1000,r[7]]:null);else if(d.v===2)rows=d.r.map(r=>{if(!Array.isArray(r)||r.length!==4||!r.every(Number.isSafeInteger)||r[0]<0||r[0]>=18)return null;const k=r[0];return [['supply','defense','bridge'][Math.floor(k/6)],mk[Math.floor(k%6/2)],k%2?60:30,0,r[1]/10,r[2],r[3]*1000,0];});else return [];}return rows.every(valid)?addScore(rows,null):[];}catch{return [];}}
 export function cookiePath(path){return path.endsWith('/')?path:path.slice(0,path.lastIndexOf('/')+1);}

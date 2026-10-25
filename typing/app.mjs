@@ -1,81 +1,51 @@
 import {Game,scenes,modes,addScore,decodeScores,encodeScores,cookiePath} from './model.mjs';
-const $=id=>document.getElementById(id),NAME='lucas_lab_typing_v1';
+import {createAudio} from './audio.mjs';
+const $=id=>document.getElementById(id),NAME='lucas_lab_typing_v1',NS='http://www.w3.org/2000/svg';
 const attrs=`; Path=${cookiePath(location.pathname)}; SameSite=Lax${location.protocol==='https:'?'; Secure':''}`;
 function rawCookie(){try{return document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith(NAME+'='))?.slice(NAME.length+1)||'';}catch{return '';}}
 function writeCookie(value,maxAge=31536000){try{document.cookie=`${NAME}=${value}; Max-Age=${maxAge}${attrs}`;return rawCookie()===(maxAge?value:'');}catch{return false;}}
-function storageMessage(ok){$('storageStatus').textContent=ok?'成绩使用本地 Cookie 保存。':'此浏览器无法保存 Cookie：成绩仅在当前页面临时显示，刷新会丢失。请检查浏览器设置。';$('storageStatus').classList.toggle('storage-warning',!ok);}
-let scores=decodeScores(rawCookie()),game,ready=false,composing=false;
-storageMessage(writeCookie(encodeScores(scores)));
-function ranking(){
- const scene=$('scene').value,mode=$('mode').value,duration=Number($('duration').value);
- $('groupLabel').textContent=`${scenes[scene].label} · ${modes[mode].label} · ${duration} 秒`;
- const rows=scores.filter(r=>r[0]===scene&&r[1]===mode&&r[2]===duration);
- $('scores').querySelector('tbody').replaceChildren(...rows.map((row,i)=>{
-  const tr=document.createElement('tr');for(const value of [i+1,`玩家 · ${new Date(row[5]).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}`,row[3].toFixed(1),`${row[4]}%`]){const td=document.createElement('td');td.textContent=value;tr.append(td);}return tr;
- }));$('empty').hidden=rows.length>0;
-}
-function node(className,text='',style=''){const el=document.createElement('div');el.className=className;el.textContent=text;el.style.cssText=style;return el;}
-function arena(now){
- const a=$('arena'),n=game.completed,t=game.elapsed(now);a.replaceChildren(node('arena-title',scenes[game.scene].label));
- if(game.scene==='supply'){
-  const load=n===0?0:(n-1)%8+1,ships=Math.floor(n/8);
-  a.append(node('planet'),node('dock'),node('ship',`货舱 ${load} / 8`));
-  for(let i=0;i<load;i++)a.append(node('crate','✦',`left:${8+(i%4)*7}%;bottom:${42+Math.floor(i/4)*29}px`));
-  a.append(node('cargo-label',`已装 ${n} 箱 · 已发船 ${ships} 艘`));a.setAttribute('aria-label',`补给站：已装 ${n} 箱，已发船 ${ships} 艘`);
- }else if(game.scene==='bridge'){
-  const step=n===0?0:(n-1)%10+1;
-  a.append(node('planet'),node('bank left'),node('bank right'),node('finish-flag','⚑'));
-  for(let i=0;i<step;i++)a.append(node('bridge-segment','',`left:${10+i*8}%`));
-  const robot=node('robot','🤖',`left:${7+step*8}%`);robot.id='robot';robot.dataset.step=step;a.append(robot,node('arena-summary',`已修 ${n} 段 · 到站 ${Math.floor(n/10)} 次`));a.setAttribute('aria-label',`修桥：已建 ${n} 段，机器人前进到第 ${step} 段`);
- }else{
-  a.append(node('shield-wall','',`--shield:${game.shield/3}`),node('turret','♜'));
-  for(const [i,e] of game.enemies.entries()){
-   const el=node(`enemy${i===0?' active':''}`,e.text,`left:${e.x}%;top:${12+68*Math.max(0,Math.min(1,(t-e.born)/e.life))}%`);el.dataset.enemy=e.id;el.setAttribute('aria-label',`${i===0?'当前键盘目标':'待拦截'}：${e.text}`);a.append(el);
-  }
-  if(game.laser&&t-game.laser.at<650){
-   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='laser';svg.classList.add('laser-layer');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-label','炮台激光命中目标');svg.setAttribute('role','img');
-   const line=document.createElementNS(svg.namespaceURI,'line');for(const [k,v] of Object.entries({x1:50,y1:91,x2:game.laser.x,y2:game.laser.y,class:'laser-beam'}))line.setAttribute(k,v);
-   const impact=document.createElementNS(svg.namespaceURI,'circle');for(const [k,v] of Object.entries({cx:game.laser.x,cy:game.laser.y,r:3,class:'impact'}))impact.setAttribute(k,v);svg.append(line,impact);a.append(svg);
-  }
-  a.setAttribute('aria-label',`太空防御：护盾 ${game.shield}/3，已拦截 ${n} 项，当前目标 ${game.target||'等待下一项'}`);
- }
-}
-function render(){
- const now=Date.now(),text=game.target,value=game.value;
- $('target').dataset.text=text;$('target').replaceChildren(...[...(text||'等待下一项目标…')].map((ch,i)=>{const el=document.createElement('span');el.textContent=ch;el.className=i<value.length?(ch===value[i]?'correct':'wrong'):(i===value.length?'current':'');return el;}));
- if(!composing)$('entry').value=value;$('entry').disabled=!ready||game.done||game.pausedAt!==null;$('entry').readOnly=!text;
- $('remaining').textContent=game.remaining(now);$('completed').textContent=game.completed;
- $('correctCount').textContent=game.correct+[...value].filter((c,i)=>c===text[i]).length;
- $('shieldBox').hidden=game.scene!=='defense';$('shield').textContent=game.shield;$('shieldMeter').value=game.shield;
- $('resume').hidden=game.pausedAt===null;$('start').disabled=ready&&!game.done;$('restart').disabled=!ready;
- arena(now);
-}
-function finish(result){
- if(!result)return;
- $('result').textContent=`${result.reason==='shield'?'防御失败：护盾已归零！':'任务完成！'} 完成 ${result.completed} 项 · 速度 ${result.wpm.toFixed(1)} WPM · 准确率 ${result.accuracy}% · 用时 ${result.elapsed.toFixed(1)} 秒。${result.eligible?'已结算本轮成绩。':'本轮曾暂停，仅练习，不入榜。'}`;
- $('status').textContent='可以重新开始，或换一个任务。';
- if(result.eligible){const persisted=decodeScores(rawCookie());scores=addScore(persisted.length?persisted:scores,[game.scene,game.mode,game.duration,result.wpm,result.accuracy,Date.now()]);const encoded=encodeScores(scores);storageMessage(encoded.length<3800&&writeCookie(encoded));ranking();}
- render();
-}
-function setup(start=false){
- ready=start;composing=false;game=new Game($('scene').value,$('mode').value,Number($('duration').value));$('result').textContent='';
- $('hint').textContent={supply:'完整打对一项，装上一箱星矿；8 箱发一艘船。',defense:'金色边框 ⌨ 是当前目标。完整打对才开炮；漏一项扣 1 护盾，0 点立即失败。',bridge:'完整打对一项，建一段真实桥面，机器人向前一步；10 段到站。'}[game.scene];
- $('status').textContent=start?'准备好了：输入第一个字符才开始计时。':'准备好就开始吧。';render();ranking();if(start)$('entry').focus();
-}
-function tick(){if(!ready||game.done||game.pausedAt!==null)return;const result=game.step(Date.now());render();finish(result);}
-function input(){
- if(composing||!ready||game.done||game.pausedAt!==null)return;
- const result=game.input($('entry').value,Date.now());render();finish(result);
- if(!game.done)$('status').textContent=game.target?'照着当前目标输入，红色表示错误，可退格修改。':'拦截成功！等待下一项目标…';
-}
-$('start').addEventListener('click',()=>setup(true));$('restart').addEventListener('click',()=>setup(true));
-for(const id of ['scene','mode','duration'])$(id).addEventListener('change',()=>setup(false));
-$('entry').addEventListener('compositionstart',()=>{composing=true;});$('entry').addEventListener('compositionend',()=>{composing=false;input();});
-$('entry').addEventListener('input',e=>{if(!e.isComposing)input();});
-function reject(e){e.preventDefault();$('status').textContent='请用键盘自己输入，不支持粘贴或拖入文字。';}
-for(const name of ['paste','drop'])$('entry').addEventListener(name,reject);
-$('entry').addEventListener('beforeinput',e=>{if(['insertFromPaste','insertFromDrop','insertReplacementText','historyUndo','historyRedo'].includes(e.inputType))reject(e);});
-$('clear').addEventListener('click',()=>{if(!confirm('清空所有场景、内容和时长的本地成绩？此操作不能撤销。'))return;scores=[];storageMessage(writeCookie('',0));ranking();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&ready){const result=game.pause(Date.now());render();finish(result);if(game.pausedAt!==null)$('status').textContent='已自动暂停。返回后点击继续，本轮仅练习、不入榜。';}else tick();});
-$('resume').addEventListener('click',()=>{if(document.hidden)return;game.resume(Date.now());render();$('status').textContent='继续练习：本轮因暂停不入榜。';$('entry').focus();});
-window.addEventListener('focus',tick);setInterval(tick,100);setup();
+function storageMessage(ok){$('storageStatus').textContent=ok?'飞行记录已在本机 Cookie 保存。':'此浏览器无法保存 Cookie，记录仅在当前页面临时保留。';$('storageStatus').classList.toggle('storage-warning',!ok);}
+let scores=decodeScores(rawCookie()),game=null,scene='supply',lastEvent=0,lastSpoken='',lastTarget='',composing=false,active=false,saved=false,armUntil=0;
+const vehicles=new Map(),effects=[];
+let audio;try{audio=createAudio();}catch{audio={};}
+function sound(method,...args){try{const result=audio?.[method]?.(...args);result?.catch?.(()=>{});}catch{/* Audio never blocks a mission. */}}
+function voiceStatus(){const supported=audio.hasSpeech?.(),english=(globalThis.speechSynthesis?.getVoices?.()||[]).some(v=>/^en\b/i.test(v.lang));$('audioStatus').textContent=!supported?'此浏览器不支持朗读；游戏仍可使用':!english?'未检测到英语语音。请安装设备英语语音包或换浏览器；游戏仍可使用。':'本地合成音乐 / 设备英语语音（部分语音服务可能联网）';}
+globalThis.speechSynthesis?.addEventListener?.('voiceschanged',()=>{voiceStatus();lastSpoken='';speak();});
+function configureAudio(){sound('setSpeech',$('speech').checked);sound('setMusic',active&&$('music').checked);sound('setEffects',$('effects').checked);try{voiceStatus();}catch{}}
+for(const id of ['speech','music','effects'])$(id).addEventListener('change',()=>{configureAudio();if(id==='speech'&&$('speech').checked){lastSpoken='';speak();}});
+function ranking(){const mode=$('mode').value,d=Number($('duration').value),speed=Number($('speed').value);$('groupLabel').textContent=`${scenes[scene].label} · ${modes[mode].label} · ${d} 秒 · 起始 ${speed} WPM`;
+ const rows=scores.filter(r=>r[0]===scene&&r[1]===mode&&r[2]===d&&r[3]===speed).sort((a,b)=>b[7]-a[7]||b[4]-a[4]);$('scores').querySelector('tbody').replaceChildren(...rows.map((r,i)=>{const tr=document.createElement('tr');for(const value of [`${i+1} / ${new Date(r[6]).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}`,r[7],r[4].toFixed(1),`${r[5]}%`]){const td=document.createElement('td');td.textContent=value;tr.append(td);}return tr;}));$('empty').hidden=rows.length>0;const old=scores.filter(r=>r[3]===0);$('legacyStatus').textContent=old.length?`已归档 ${old.length} 条旧版记录（包含旧修桥任务）；起始速度未知，不参与新榜。`:'';}
+function svg(symbol,className=''){const el=document.createElementNS(NS,'svg'),use=document.createElementNS(NS,'use');use.setAttribute('href',`#${symbol}`);el.append(use);if(className)el.setAttribute('class',className);return el;}
+function position(e,now){const t=game.elapsed(now),p=Math.max(0,Math.min(1,(t-e.born)/e.life)),w=$('arena').clientWidth,h=$('arena').clientHeight,el=vehicles.get(e.id),ew=el?.offsetWidth||(e.large?230:120),eh=el?.offsetHeight||95;let x,y;if(game.scene==='supply'){x=8+p*Math.max(0,w-ew-20);y=h-170;}else{const horizontal=e.formation?(e.order%2?.71:.29):e.x/100;x=horizontal*w-ew/2;y=(game.scene==='assault'?126:55)+p*(h-(game.scene==='assault'?250:190));if(e.formation){const row=Math.floor(e.order/2),rows=Math.ceil(e.total/2);y=55+row*46+p*Math.max(12,h-eh-47-(55+(rows-1)*46));}}return {x:Math.max(5,Math.min(w-ew-5,x)),y:Math.min(h-eh-42,y),w,h,ew,eh};}
+function syncVehicles(now){const ids=new Set(game.enemies.map(e=>e.id));for(const [id,el] of vehicles)if(!ids.has(id)){el.remove();vehicles.delete(id);}for(const [i,e] of game.enemies.entries()){let el=vehicles.get(e.id);if(!el){el=document.createElement('div');el.className=`vehicle ${e.large?'large ':''}${e.formation?'formation ':''}${game.scene==='supply'?'crate-vehicle':''}`;el.dataset.enemy=e.id;el.append(svg(game.scene==='supply'?'crate':e.large?'boss':'fighter'));const label=document.createElement('span');label.className='vehicle-label';label.textContent=e.text;label.dataset.order=e.order+1;el.append(label);$('vehicles').append(el);vehicles.set(e.id,el);}el.classList.toggle('active',i===0);const p=position(e,now);el.style.transform=`translate(${p.x}px,${p.y}px)`;el.setAttribute('aria-label',`${i===0?'锁定目标':'等待目标'} ${e.text}`);}}
+function addEffect(el,life=1000){$('effectsLayer').append(el);effects.push({el,end:Date.now()+life});}
+function explosion(x,y,delay=0){const el=document.createElement('div');el.className='explosion';el.style.cssText=`left:${x}px;top:${y}px;animation-delay:${delay}ms`;addEffect(el,delay+850);}
+function consumeEvents(now){for(const event of game.events){if(event.id<=lastEvent)continue;lastEvent=event.id;const p=position(event,now),x=p.x+p.ew/2,y=p.y+p.eh/2;
+ if(event.type==='load'){sound('effect','load');$('status').textContent=`装货成功！机械臂已装载第 ${game.completed} 箱。`;armUntil=now+1300;$('arena').querySelector('.arm').classList.remove('loading');void $('arena').querySelector('.arm').getBoundingClientRect();$('arena').querySelector('.arm').classList.add('loading');const crate=svg('crate','cargo-flight');crate.style.cssText=`--from-x:${p.x}px;--from-y:${p.y}px`;addEffect(crate,1350);const loaded=svg('crate','cargo-loaded');loaded.style.marginRight=`${(game.completed-1)%4*7}px`;$('effectsLayer').append(loaded);const boxes=$('effectsLayer').querySelectorAll('.cargo-loaded');if(boxes.length>8)boxes[0].remove();}
+ if(event.type==='laser'){sound('effect','laser');sound('effect','explosion');const line=document.createElement('div');line.className='laser-effect';const dx=x-p.w/2,dy=y-(p.h-80);line.style.cssText=`left:${p.w/2}px;top:${p.h-80}px;width:${Math.hypot(dx,dy)}px;transform:rotate(${Math.atan2(dy,dx)}rad)`;addEffect(line,650);explosion(x,y);$('status').textContent=`拦截成功！连击 ×${game.combo}`;}
+ if(event.type==='missile'){sound('effect','missile');sound('effect','explosion');const missile=document.createElement('div');missile.className='missile-effect';const dx=x-p.w/2,dy=y-(p.h-80);missile.style.cssText=`--dx:${dx}px;--dy:${dy}px;--angle:${Math.atan2(dx,-dy)}rad`;addEffect(missile,800);explosion(x,y,450);$('status').textContent=`导弹命中！母舰受到伤害 · 连击 ×${game.combo}`;}
+ if(event.type==='error'){sound('effect','error');$('status').textContent='本次尝试失败：错误已计入准确率，连击归零。请重新完整输入同一个目标。';}
+ if(event.type==='formation'){sound('effect','load');$('status').textContent='句子编队全部完美拦截！编队奖励 +150 分';}
+ if(event.type==='boss'){sound('effect','explosion');explosion(p.w/2,95);$('status').textContent=`母舰被摧毁！+300 分 · 第 ${game.wave} 波敌舰来袭`;}
+ if(event.type==='miss'){if(game.scene!=='supply')sound('effect','explosion');$('status').textContent=game.scene==='supply'?'箱子离开传送带，连击归零。试试下一个！':'敌舰突破防线，护盾受损！';$('arena').classList.remove('hit');void $('arena').offsetWidth;$('arena').classList.add('hit');}
+ }}
+function speak(){if(!game||!active||game.done)return;const e=game.enemies[0],key=e?`${game.scene}/${e.id}`:'';if(key&&key!==lastSpoken){lastSpoken=key;sound('speak',e.text,{kind:e.text.includes(' ')?'sentence':'word'});}}
+function render(now=Date.now()){if(!game)return;const signature=game.target+'\0'+game.value;if(signature!==lastTarget){lastTarget=signature;$('target').dataset.text=game.target;$('target').replaceChildren(...[...game.target].map((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.className=i<game.value.length?(ch===game.value[i]?'correct':'wrong'):i===game.value.length?'current':'';return s;}));}if(!composing&&$('entry').value!==game.value)$('entry').value=game.value;$('entry').disabled=game.done||game.pausedAt!==null||!active;const stats=game.stats(now);for(const [id,v] of Object.entries({remaining:game.remaining(now),score:game.score,combo:game.combo,wpm:stats.wpm,accuracy:stats.accuracy,completed:game.completed,correctCount:game.hits,shield:game.shield,bossHP:game.bossHP,wave:game.wave}))if($(id).textContent!==String(v))$(id).textContent=v;$('resume').hidden=game.pausedAt===null;$('cargoCount').textContent=game.scene==='supply'?`已装载 ${game.completed} 箱 · 已发船 ${Math.floor(game.completed/8)} 艘`:`第 ${game.wave} 波 · ${game.enemies.some(e=>e.formation)?'句子编队':'单舰目标'}`;$('bossFill').style.width=game.bossHP+'%';$('arena').style.setProperty('--shield',game.shield/3);syncVehicles(now);consumeEvents(now);speak();}
+function finish(result){if(!result||saved)return;saved=true;sound('stop');$('result').textContent=`${result.reason==='shield'?'防御失败：护盾已归零。':'任务完成！'}\n完成 ${result.completed} 项 · ${result.score} 分 · ${result.wpm.toFixed(1)} WPM · 准确率 ${result.accuracy}% · ${result.elapsed.toFixed(1)} 秒\n${result.eligible?'本轮成绩已结算。':'本轮曾暂停，仅练习，不入榜。'}`;$('status').textContent='返回任务选择，或重新出发。';if(result.eligible){const persisted=decodeScores(rawCookie());scores=addScore(persisted.length?persisted:scores,[game.scene,game.mode,game.duration,game.speed,result.wpm,result.accuracy,Date.now(),result.score]);storageMessage(writeCookie(encodeScores(scores)));ranking();}render();}
+function start(selected=scene){scene=selected;sound('stop');sound('unlock');game=new Game(scene,$('mode').value,Number($('duration').value),{speed:Number($('speed').value)});active=true;saved=false;composing=false;lastTarget='';lastSpoken='';lastEvent=0;armUntil=0;vehicles.clear();$('vehicles').replaceChildren();$('effectsLayer').replaceChildren();effects.length=0;$('arena').querySelector('.arm').classList.remove('loading');$('arena').className=`arena scene-${scene}`;$('chooser').hidden=true;$('play').hidden=false;$('mode').disabled=true;$('duration').disabled=true;$('speed').disabled=true;$('missionTitle').textContent=scenes[scene].label;$('missionEn').textContent=scenes[scene].en;$('sceneReadout').textContent={supply:'CARGO DECK / 装货甲板',defense:'BASE PERIMETER / 基地防线',assault:'ENEMY FLAGSHIP / 敌方母舰'}[scene];$('shieldBox').hidden=scene==='supply';$('bossBox').hidden=scene!=='assault';document.querySelector('.boss-health').hidden=scene!=='assault';$('hint').textContent={supply:'输入箱上单词 → 机械臂装船。每 8 箱完成一船补给。',defense:'输入金框敌舰的单词 → 激光拦截。句子编队按序击破，无错有额外奖励。',assault:'输入敌舰上的单词或句子 → 导弹攻击。击落护航舰，同时削弱母舰。'}[scene];$('status').textContent='准备好了！第一个字符才开始计时。错误不可退格，打满后可重新挑战。';$('result').textContent='';configureAudio();render();ranking();$('entry').focus();$('play').scrollIntoView({block:'start'});}
+for(const card of document.querySelectorAll('[data-mission]'))card.addEventListener('click',()=>start(card.dataset.mission));$('restart').addEventListener('click',()=>start());$('back').addEventListener('click',()=>{active=false;sound('stop');$('chooser').hidden=false;$('play').hidden=true;for(const id of ['mode','duration','speed'])$(id).disabled=false;$('chooser').scrollIntoView({block:'start'});});
+for(const id of ['mode','duration','speed'])$(id).addEventListener('input',()=>{$('speedLabel').textContent=`${$('speed').value} WPM`;ranking();});
+function reject(e,message='请逐字键入，不能编辑已有位置、粘贴或自动填充。'){e.preventDefault();$('status').textContent=message;}
+function insert(ch){if(!active||!game||game.done||game.pausedAt!==null)return;const result=game.input(game.value+ch,Date.now());render();finish(result);}
+$('entry').addEventListener('keydown',e=>{if(composing||e.isComposing||e.key==='Process')return;if(e.ctrlKey||e.metaKey||e.altKey||['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','Insert','PageUp','PageDown'].includes(e.key)){reject(e);return;}if(e.key.length===1&&/^[\x20-\x7e]$/.test(e.key)){e.preventDefault();insert(e.key);}else if(e.key==='Enter')e.preventDefault();});
+$('entry').addEventListener('beforeinput',e=>{if(composing||e.isComposing){e.preventDefault();return;}if(e.inputType==='insertText'&&typeof e.data==='string'&&e.data.length===1&&/^[\x20-\x7e]$/.test(e.data)){e.preventDefault();insert(e.data);}else reject(e);});
+for(const type of ['paste','drop','cut'])$('entry').addEventListener(type,reject);
+$('entry').addEventListener('input',()=>{if(!composing)$('entry').value=game?.value??'';});
+$('entry').addEventListener('compositionstart',()=>{composing=true;$('status').textContent='请切换到英文输入法；输入法组合文字不会计入成绩。';});$('entry').addEventListener('compositionend',()=>{composing=false;$('entry').value=game?.value??'';});
+for(const type of ['select','pointerup','focus'])$('entry').addEventListener(type,()=>{const n=$('entry').value.length;$('entry').setSelectionRange(n,n);});
+$('resume').addEventListener('click',()=>{if(document.hidden)return;game.resume(Date.now());sound('unlock');configureAudio();$('status').textContent='继续练习：本轮因暂停不入榜。';render();$('entry').focus();});
+document.addEventListener('visibilitychange',()=>{if(!active||!game||game.done)return;if(document.hidden){const result=game.pause(Date.now());sound('stop');render();finish(result);if(game.pausedAt!==null)$('status').textContent='切到后台，已暂停。本轮仅练习、不入榜；点击继续。';}else{finish(game.step(Date.now()));render();}});
+window.addEventListener('focus',()=>{if(active&&game){finish(game.step(Date.now()));render();}});window.addEventListener('pagehide',()=>sound('dispose'));
+$('clear').addEventListener('click',()=>{if(!confirm('清空全部任务、速度和旧版归档记录？此操作不能撤销。'))return;scores=[];storageMessage(writeCookie('',0));ranking();});
+function frame(){const now=Date.now();if(active&&game&&!game.done){finish(game.step(now));render(now);}for(let i=effects.length-1;i>=0;i--)if(now>=effects[i].end){effects[i].el.remove();effects.splice(i,1);}if(armUntil&&now>=armUntil){document.querySelector('.arm').classList.remove('loading');armUntil=0;}requestAnimationFrame(frame);}
+storageMessage(writeCookie(encodeScores(scores)));configureAudio();ranking();requestAnimationFrame(frame);

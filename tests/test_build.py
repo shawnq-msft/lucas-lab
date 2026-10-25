@@ -23,9 +23,18 @@ class SiteBuild(unittest.TestCase):
         home=(ROOT/'index.html').read_text()
         self.assertIn('href="typing/"',home)
         self.assertIn('Cookie',home)
-        for scene in ['星矿补给站','太空防御','星际修桥']:
+        for scene in ['星矿补给站','太空防御','太空反攻']:
             self.assertIn(scene,home)
+        self.assertNotIn('星际修桥',home)
+        self.assertIn('起始速度',home)
         self.assertIn('tokamak typing _site/',(ROOT/'.github/workflows/pages.yml').read_text())
+    def test_computer_is_linked_staged_and_tested(self):
+        self.assertIn('href="computer/"',(ROOT/'index.html').read_text())
+        workflow=(ROOT/'.github/workflows/pages.yml').read_text()
+        self.assertIn('computer _site/',workflow)
+        self.assertIn('tests/computer.test.mjs',workflow)
+        for name in ['index.html','app.mjs','model.mjs','computer.css']:
+            self.assertTrue((ROOT/'computer'/name).is_file())
     def test_integrated_modules_have_home_link(self):
         for name in ['practice','tokamak']:
             self.assertIn('href="../"',(ROOT/name/'index.html').read_text())

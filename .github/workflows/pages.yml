@@ -25,14 +25,27 @@ jobs:
           python3 -m unittest discover -s sources/practice -p test_engine.py -v
           python3 -m unittest discover -s sources/practice -p test_advanced.py -v
           python3 -m unittest discover -s sources/practice -p test_combinations.py -v
-          node --test tests/model.test.mjs tests/advanced.test.mjs tests/typing.test.mjs
+          node --test tests/model.test.mjs tests/advanced.test.mjs tests/typing.test.mjs tests/typing_audio.test.mjs tests/computer.test.mjs
           python3 -m unittest discover -s tests -p test_algorithm_python.py -v
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Browser acceptance
+        run: |
+          python3 -m pip install playwright==1.64.0
+          python3 -m playwright install --with-deps chromium
+          python3 -m http.server 8786 --bind 127.0.0.1 > /tmp/lucas-http.log 2>&1 &
+          trap 'kill $!' EXIT
+          python3 tests/typing_browser.py
+          python3 tests/typing_audio_browser.py
+          python3 tests/computer_browser.py
       - uses: actions/configure-pages@v5
       - name: Stage public site only
         run: |
           mkdir _site
           cp index.html styles.css favicon.svg .nojekyll _site/
           cp -r practice algorithms tokamak typing _site/
+          cp -r computer _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

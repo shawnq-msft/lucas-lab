@@ -1,44 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as M from '../typing/model.mjs';
-const {Run,modes,cookiePath}=M;
-test('stats retain corrected mistakes and deadline rejects late input',()=>{
- const r=new Run('cat',30);r.update('x',1000);r.update('',2000);r.update('c',3000);r.update('ca',4000);const s=r.update('cat',7000);assert.equal(s.accuracy,75);assert.equal(s.wpm,6);assert.equal(r.finish(8000),null);
- const late=new Run('cat',30);late.update('c',1000);assert.equal(late.update('cat',31001).wpm,0.4);assert.equal(late.value,'c');
-});
-test('three scenes and safe whole expression prompts',()=>{
- assert.deepEqual(Object.keys(M.scenes),['supply','defense','bridge']);assert.equal(Object.keys(modes).length,3);
- assert.ok(modes.symbols.items.some(x=>x.includes(' ')));for(const m of Object.values(modes))for(const x of m.items)assert.match(x,/^[\x20-\x7e]+$/);
-});
-test('supply and bridge advance only on exact whole prompt without separator',()=>{
- for(const scene of ['supply','bridge']){const g=new M.Game(scene,'words',30);assert.equal(g.remaining(99999),30);g.input('x',1000);assert.equal(g.completed,0);g.input('',1100);const t=g.target;for(let i=1;i<=t.length;i++)g.input(t.slice(0,i),1200+i);assert.equal(g.completed,1);assert.equal(g.value,'');assert.notEqual(g.target,t);assert.equal(g.attempts,t.length+1);assert.equal(g.hits,t.length);assert.equal(g.progress,1);}
-});
-test('defense exact laser only, gentle descent, bounded spawning, shield zero fails once',()=>{
- const g=new M.Game('defense','words',60);assert.ok(g.enemies[0].life>=8000&&g.enemies[0].life<=15000);g.input('x',0);assert.equal(g.laser,null);g.input(g.target,100);assert.equal(g.completed,1);assert.ok(g.laser);assert.equal(g.shield,3);g.step(6000);assert.ok(g.enemies.length<=3);g.step(20000);assert.ok(g.shield<3);assert.ok(g.enemies.length<=3);
- let result;for(let t=21000;t<=59000&&!result;t+=1000)result=g.step(t);assert.equal(result.reason,'shield');assert.equal(g.shield,0);assert.equal(g.done,true);assert.equal(g.step(61000),null);assert.equal(g.input('cat',62000),null);
- const jump=new M.Game('defense','words',60);jump.input('x',0);jump.step(25000);assert.equal(jump.shield,2);assert.ok(jump.enemies.length<=1,'no overdue spawn flood');
-});
-test('elapsed truthful; pause removes ranking eligibility and cannot farm wall time',()=>{
- const g=new M.Game('bridge','symbols',30);g.input('x',1000);g.pause(2000);assert.equal(g.eligible,false);assert.equal(g.remaining(90000),29);g.resume(90000);assert.equal(g.remaining(91000),28);const s=g.step(120000);assert.equal(s.elapsed,30);assert.equal(s.eligible,false);assert.equal(g.step(150000),null);
- const late=new M.Game('supply','words',30);late.input('c',0);const r=late.input('cat',31000);assert.equal(late.completed,0);assert.equal(r.elapsed,30);
-});
-test('all 18 boards separate, bounded and compact even maximum numbers',()=>{
- let rows=[];for(const scene of Object.keys(M.scenes))for(const mode of Object.keys(modes))for(const duration of [30,60])for(let n=0;n<8;n++)rows=M.addScore(rows,[scene,mode,duration,1999.9,100,4102444799999-n]);
- assert.equal(rows.length,36);assert.ok(M.encodeScores(rows).length<3800);assert.deepEqual(M.decodeScores(M.encodeScores(rows)),rows.map(r=>[...r.slice(0,5),Math.floor(r[5]/1000)*1000]));
- assert.equal(rows.filter(r=>r[0]==='defense'&&r[1]==='words'&&r[2]===30).length,2);
-});
-test('expression whitespace exactness and full supply/bridge cycles',()=>{
- const d=new M.Game('defense','symbols',60);d.input('x=1',0);assert.equal(d.completed,0);assert.equal(d.laser,null);d.input('x = 2',100);assert.equal(d.completed,0);d.input('x = ',200);d.input('x = 1',300);assert.equal(d.completed,1);assert.ok(d.laser);
- for(const scene of ['supply','bridge']){const g=new M.Game(scene,'python',30);for(let i=0;i<12;i++)g.input(g.target,i*1000);assert.equal(g.progress,12);assert.equal(g.completed,12);assert.equal(g.done,false);}
-});
-test('strict cookie numeric, schema and board validation',()=>{
- const row=['supply','words',30,10,90,1700000000000];
- for(const [index,value] of [[0,'constructor'],[1,'bad'],[2,90],[3,-1],[3,2001],[4,1.5],[4,101],[5,0]]){const bad=[...row];bad[index]=value;assert.deepEqual(M.addScore([],bad),[]);}
- for(const r of [[[0,1.5,90,1700000000]],[[0,-1,90,1700000000]],[[18,1,90,1700000000]],[[0,1,101,1700000000]],[[0,1,90,0]],[[0,1,90,1700000000,0]]])assert.deepEqual(M.decodeScores(encodeURIComponent(JSON.stringify({v:2,r}))),[]);
-});
-test('invalid cookies rejected, previous boards migrate to supply, path derived',()=>{
- for(const raw of ['%ZZ','null','{}','x'.repeat(4000),encodeURIComponent(JSON.stringify({v:2,r:[[99,0,30,1,90,1700000000]]}))])assert.deepEqual(M.decodeScores(raw),[]);
- assert.deepEqual(M.decodeScores(encodeURIComponent(JSON.stringify([['words',30,12,90,1700000000000]]))),[['supply','words',30,12,90,1700000000000]]);
- assert.equal(cookiePath('/lucas-lab/typing/index.html'),'/lucas-lab/typing/');
- assert.deepEqual(M.addScore([] ,['bad','words',30,0,100,1700000000000]),[]);
-});
+const rng=()=>0.37, make=(scene='supply',options={})=>new M.Game(scene,'words',60,{speed:20,rng,...options});
+const type=(g,text=g.target,now=100)=>{for(const ch of text)g.input(g.value+ch,now++);};
+test('v3 missions, large printable curricula and shuffled no-repeat bags',()=>{assert.deepEqual(Object.keys(M.scenes),['supply','defense','assault']);assert.ok(M.modes.words.items.length>=60);for(const m of Object.values(M.modes))for(const x of m.items)assert.match(x,/^[\x20-\x7e]+$/);for(const random of [rng,undefined]){const b=new M.ShuffleBag(['a','b','c','d'],random);for(let n=0;n<4;n++)assert.equal(new Set(Array.from({length:4},()=>b.next())).size,4);}assert.equal(new M.ShuffleBag(['a'],rng).next(),'a');});
+test('immutable errors consume slots, deletion/replacement cannot repair; fresh attempt succeeds',()=>{const g=make(),target=g.target;g.input('~',0);g.input('',1);g.input(target[0],2);assert.equal(g.value,'~');assert.equal(g.attempts,1);type(g,target.slice(1));assert.equal(g.completed,0);assert.equal(g.value,'');assert.equal(g.combo,0);assert.equal(g.events.at(-1).type,'error');type(g,target);assert.equal(g.completed,1);assert.equal(g.events.filter(e=>e.type==='load').length,1);assert.ok(g.attempts>g.hits);assert.equal(g.input('x'.repeat(200),500),null);});
+test('exact success routes arm, laser, missile and damages boss only on success',()=>{for(const [scene,event] of [['supply','load'],['defense','laser'],['assault','missile']]){const g=make(scene);type(g);assert.equal(g.completed,1);assert.ok(g.events.some(e=>e.type===event));assert.ok(g.events[0].id>0);assert.equal(new Set(g.events.map(e=>e.id)).size,g.events.length);assert.equal(g.value,'');if(scene==='assault'){assert.ok(g.bossHP<100);for(let i=0;i<4;i++)type(g,undefined,1000+i*100);assert.ok(g.bossDefeated>=1);}}});
+test('formation sequence grants bonus only when every word is perfect',()=>{const g=make('defense');for(let i=0;i<3;i++)type(g,undefined,i*500);assert.ok(g.enemies[0].formation);const id=g.enemies[0].formation;while(g.enemies[0]?.formation===id)type(g,undefined,2000);assert.ok(g.events.some(e=>e.type==='formation'));const bad=make('defense');for(let i=0;i<3;i++)type(bad);const group=bad.enemies[0].formation;type(bad,'~'.repeat(bad.target.length));while(bad.enemies[0]?.formation===group)type(bad);assert.equal(bad.events.some(e=>e.type==='formation'),false);});
+test('speed and elapsed/round progression control humane travel and bounded spawns',()=>{const slow=make('defense',{speed:5}),fast=make('defense',{speed:60});assert.ok(slow.travelTime(8)>fast.travelTime(8));assert.ok(fast.travelTime(3)>=8000);const initial=slow.travelTime(8);slow.completed=20;slow.started=0;assert.ok(slow.travelTime(8,40000)<initial);const g=make('defense',{speed:60});g.input('~',0);g.step(25000);assert.ok(g.enemies.length<=3);assert.equal(g.shield,2);let result;for(let t=26000;t<60000&&!result;t+=1000)result=g.step(t);assert.equal(result.reason,'shield');assert.equal(g.step(70000),null);});
+test('timestamp deadline, pause is unranked, result exactly once, correct WPM and accuracy',()=>{const g=make();type(g,undefined,0);const r=g.step(60001);assert.equal(r.elapsed,60);assert.equal(r.wpm,Math.round(g.hits/5*10)/10);assert.equal(r.accuracy,100);assert.equal(g.step(70000),null);const p=make();p.input('~',1000);p.pause(2000);assert.equal(p.remaining(90000),59);p.resume(90000);assert.equal(p.remaining(91000),58);assert.equal(p.step(150000).eligible,false);});
+test('nearest deadline auto-locks between attempts, but never switches a partial attempt',()=>{const g=make('defense');g.started=0;g.enemies.push({...g.enemies[0],id:99,text:'urgent',life:9000,born:0});g.enemies[0].life=20000;g.step(1000);assert.equal(g.target,'urgent');g.input('u',1001);g.enemies[1].life=8000;g.step(2000);assert.equal(g.target,'urgent');assert.equal(g.input('u\n',2001),null);assert.equal(g.value,'u');});
+test('strict score groups include speed, compact global cap and safe legacy archive',()=>{let rows=[];for(const scene of Object.keys(M.scenes))for(const mode of Object.keys(M.modes))for(const speed of [5,10,20,30,45,60])for(let n=0;n<4;n++)rows=M.addScore(rows,[scene,mode,30,speed,123.4,99,1700000000000+n,500]);assert.ok(rows.length<=32);const encoded=M.encodeScores(rows);assert.ok(encoded.length<3800);const decoded=M.decodeScores(encoded);assert.equal(decoded.length,rows.length);assert.ok(decoded.every(r=>r.length===8));const pair=M.addScore([],['supply','words',30,5,10,90,1700000000000,2]);assert.equal(M.addScore(pair,['supply','words',30,60,10,90,1700000000000,2]).length,2);const old=M.decodeScores(encodeURIComponent(JSON.stringify({v:2,r:[[12,100,90,1700000000]]})));assert.equal(old[0][0],'bridge');assert.equal(old[0][3],0);for(const raw of ['%ZZ','null','{}','x'.repeat(3800),encodeURIComponent(JSON.stringify({v:3,r:[[0,1]]}))])assert.deepEqual(M.decodeScores(raw),[]);for(const val of [NaN,-1,61,'20'])assert.throws(()=>make('supply',{speed:val}));assert.equal(M.cookiePath('/lab/typing/index.html'),'/lab/typing/');});
