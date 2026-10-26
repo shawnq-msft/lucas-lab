@@ -37,6 +37,8 @@ jobs:
           python3 -m http.server 8786 --bind 127.0.0.1 > /tmp/lucas-http.log 2>&1 &
           trap 'kill $!' EXIT
           python3 tests/typing_browser.py
+          python3 tests/typing_threshold_browser.py
+          python3 tests/typing_speed_browser.py
           python3 tests/typing_audio_browser.py
           python3 tests/computer_browser.py
       - uses: actions/configure-pages@v5
