@@ -26,6 +26,8 @@ jobs:
           python3 -m unittest discover -s sources/practice -p test_advanced.py -v
           python3 -m unittest discover -s sources/practice -p test_combinations.py -v
           node --test tests/model.test.mjs tests/advanced.test.mjs tests/typing.test.mjs tests/typing_audio.test.mjs tests/computer.test.mjs tests/mali.test.mjs
+          python3 -m unittest discover -s tests -p test_camp101_content.py -v
+          node --test tests/camp101.test.mjs
           python3 -m unittest discover -s tests -p test_mali_content.py -v
           python3 -m unittest discover -s tests -p test_algorithm_python.py -v
       - uses: actions/setup-python@v5
@@ -43,6 +45,7 @@ jobs:
           python3 tests/typing_audio_browser.py
           python3 tests/computer_browser.py
           python3 tests/mali_browser.py
+          python3 tests/camp101_browser.py
       - uses: actions/configure-pages@v5
       - name: Stage public site only
         run: |
@@ -51,6 +54,7 @@ jobs:
           cp -r practice algorithms tokamak typing _site/
           cp -r computer _site/
           cp -r mali _site/
+          cp -r camp101 _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
