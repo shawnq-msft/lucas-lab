@@ -31,6 +31,7 @@ jobs:
           node --test tests/camp101.test.mjs
           python3 -m unittest discover -s tests -p test_mali_content.py -v
           python3 -m unittest discover -s tests -p test_creative.py -v
+          python3 -m unittest discover -s tests -p test_robotics.py -v
           python3 -m unittest discover -s tests -p test_algorithm_python.py -v
       - uses: actions/setup-python@v5
         with:
@@ -50,6 +51,7 @@ jobs:
           python3 tests/camp101_browser.py
           python3 tests/school_admissions_browser.py
           python3 tests/creative_browser.py
+          python3 tests/robotics_browser.py
       - uses: actions/configure-pages@v5
       - name: Stage public site only
         run: |
@@ -61,6 +63,7 @@ jobs:
           cp -r creative _site/
           cp -r camp101 _site/
           cp -r school-admissions _site/
+          cp -r robotics _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="description" content="Lucas Lab 四足机器人三阶段路线：2DOF视觉语音、ToF强化学习、3DOF丰富动作。"><title>四足机器人路线 · Lucas Lab</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="roadmap.css"></head>
+<body class="robot-roadmap">
+<header class="top"><a class="brand" href="../">Lucas Lab<span>动手，想明白。</span></a><a href="../">返回实验室</a></header>
+<main class="roadmap">
+<div class="eyebrow">ROBOTICS / BUILD → SENSE → EXPRESS</div>
+<h1>先让它看见、听懂，<br>再学会怎么走。</h1>
+<p class="lead">从 Sesame 衍生四足出发：先做每腿 2DOF 的视觉语音机器人，再增加 ToF 做 RL 学习，最后每腿增加一个自由度，让动作更丰富。</p>
+<p class="status"><strong>路线已确定 · 实现待验证</strong><br>这是分阶段项目计划，不是已完成的机器人演示；下列运动、感知与交互能力尚未实测。主控、传感器和音频硬件待选型。</p>
+<nav class="route-nav" aria-label="三阶段路线"><a href="#stage-1">01 看见与对话</a><a href="#stage-2">02 探地与学习</a><a href="#stage-3">03 丰富动作</a></nav>
+<section class="stage" id="stage-1" aria-labelledby="heading-1">
+<div class="chapter"><span>第一步</span><strong>2DOF</strong><small>四足 · 每腿两个自由度</small></div>
+<div class="chapter-body"><h2 id="heading-1">视觉 + 语音，先跑通互动。</h2>
+<p>保留简单腿部结构，先把机械、供电和控制调通，再接入相机、麦克风和扬声器。用确定性的基础步态起步，本阶段不以 RL 或复杂地形为前提。</p>
+<div class="split"><div><h3>做什么</h3><ul><li>单关节标定、站立、低速行走、停止。</li><li>验证一种明确的视觉任务，例如识别指定物体；先观察和提示，不直接放开自主追踪。</li><li>语音识别与回复，调用有限的安全动作，例如“站起来”“停下”。</li><li>优先评估电脑或远端负责视觉与语音，机器人端负责稳定执行；具体主控尚未冻结。</li></ul></div><div><h3>过关证据</h3><ul><li>相机、语音与动作同时运行时，控制不被传输阻塞。</li><li>基础站立和慢走有真实测试记录。</li><li>测试失联、错误指令、关节限位与手动断电。</li><li>记录载荷、供电掉压和舵机发热，再决定电池配置。</li></ul></div></div>
+<p class="note">语音模型不直接控制舵机：语言意图 → 允许的技能 → 实时控制。安全停止与限位由确定性逻辑负责。IMU建议作为姿态反馈；足端触地检测是可选补充，不冒充已采购配置。</p>
+<p class="question">小实验：机器人听错一句话时，怎样让它仍然安全？</p>
+</div></section>
+<section class="stage" id="stage-2" aria-labelledby="heading-2">
+<div class="chapter"><span>第二步</span><strong>+ ToF</strong><small>保留每腿 2DOF · 引入 RL</small></div>
+<div class="chapter-body"><h2 id="heading-2">看脚边的地面，用反馈学习步态。</h2>
+<p>先验证一条腿的 ToF，再扩展到四条腿。安装意向：小腿侧面靠近膝盖处固定，朝足底附近地面测距，避开脚与小腿的自遮挡；型号、视场和最低可用距离待选型验证。</p>
+<div class="split"><div><h3>做什么</h3><ul><li>采集每腿距离、有效状态与时间戳，结合姿态和动作阶段解释读数。</li><li>建立与实物相符的仿真，先在仿真训练，再低速、受保护地迁移到实机。</li><li>模拟测距噪声、失效、延迟、遮挡，以及舵机速度、齿隙和负载限制。</li><li>研究近地减速、有限下探、抬脚与身体协调，不从无人监控的实机试错开始。</li></ul></div><div><h3>过关证据</h3><ul><li>单腿在站立、蹲低和摆动中都验证测量区域。</li><li>四模块地址、采样时序和可能的干扰已验证。</li><li>在相同地面和速度条件下，对比使用／不使用 ToF 的表现。</li><li>记录碰脚、落空、跌倒、电流和温度，不只展示最好的一次。</li></ul></div></div>
+<p class="note">ToF不等于触地，也不能证明地面可承重或脚不打滑。无效读数不等于深坑；保留有限行程和停止逻辑。MG90S命令角度也不等于实际角度。目标先限定在低速、轻度高低差，不承诺全地形能力。</p>
+<p class="question">小实验：加了距离信息后，是更少碰脚，还是只让代码更复杂？</p>
+</div></section>
+<section class="stage" id="stage-3" aria-labelledby="heading-3">
+<div class="chapter"><span>第三步</span><strong>3DOF</strong><small>每腿 +1DOF · 动作更丰富</small></div>
+<div class="chapter-body"><h2 id="heading-3">新增关节，让脚有更多选择。</h2>
+<p>在前两步跑通后，每腿增加一个自由度。优先评估髋侧摆，使腿能够张开、收拢并调整步宽；最终轴向由结构、关节范围和载荷验证决定。</p>
+<div class="split"><div><h3>做什么</h3><ul><li>先做一条带新增关节的承重试验腿，再升级整机。</li><li>探索侧向挪步、重心转移、姿态表达和更多落脚组合。</li><li>重新核算新增舵机、支架、线束造成的重量、重心和供电负担。</li><li>更新仿真几何、碰撞、动作与观测接口，重新训练或明确验证策略适配。</li></ul></div><div><h3>过关证据</h3><ul><li>新增关节带载可用，不只是悬空时能动。</li><li>检查全行程的自碰撞、线束拉扯和 ToF 遮挡。</li><li>用具体任务证明新自由度有效，而不是仅增加电机数量。</li><li>重新验证限位、失联停止和温升。</li></ul></div></div>
+<p class="note">增加自由度不自动带来自起、跳跃或上楼梯能力。先保证基础运动可靠，再扩展动作空间。</p>
+<p class="question">小实验：哪个新动作，原来的腿确实做不到？</p>
+</div></section>
+<section class="field-note" id="interfaces"><h2>现在留接口，后面少返工。</h2><ul><li><strong>机械：</strong>髋部可替换，预留侧摆空间与走线；相机、音频和 ToF 支架轻量化。</li><li><strong>电气：</strong>信号接口和电源容量分开核算；PWM通道有余量，不代表电源能带更多舵机。</li><li><strong>软件：</strong>传感器、关节映射、技能与策略分层；日志记录时间戳和数据有效性。</li><li><strong>隐私：</strong>视觉语音按需启用，不把录音录像默认上传或写入公开仓库；密钥不进入网页。</li></ul></section>
+<section class="sources" id="sources"><h2>参考与边界</h2><p>路线来自本项目讨论；参考开源项目不代表已完成复刻。页面不提供实时控制，不是采购报价，也不代表已具备复杂地形性能。</p><ul><li><a href="https://github.com/dorianborian/sesame-robot">Sesame Robot：基础机械与控制参考</a></li><li><a href="https://github.com/lukehollis/sesame-ml">Sesame ML：训练与机载运行参考</a></li></ul></section>
+</main><footer>Lucas Lab · 先做出来，再用证据改进。 / <a href="../">返回首页</a></footer>
+</body></html>
