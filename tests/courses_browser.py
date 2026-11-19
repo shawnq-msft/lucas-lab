@@ -45,7 +45,13 @@ with sync_playwright() as p:
     page.emulate_media(media='screen')
     check('screen filter restored after print', page.locator('.course-card:visible').count() == 1)
     page.locator('a[href="#esp32"]').first.click()
-    check('route reveals filtered destination', page.locator('#esp32').is_visible() and page.locator('.course-card:visible').count() == 6)
+    page.locator('#esp32').wait_for(state='visible')
+    check('route reveals filtered destination', page.locator('.course-card:visible').count() == 6)
+    # Re-clicking the current hash does not emit hashchange. It must still reveal.
+    page.locator('#category').select_option('outdoor')
+    page.locator('a[href="#esp32"]').first.click()
+    page.locator('#esp32').wait_for(state='visible', timeout=2000)
+    check('same-hash route reveals filtered destination', page.locator('.course-card:visible').count() == 6)
     expected = {
         'all': {'all': 6, '1': 4, '2': 1, '3': 1},
         'hardware': {'all': 3, '1': 2, '2': 1, '3': 0},

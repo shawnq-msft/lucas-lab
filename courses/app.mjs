@@ -27,14 +27,18 @@ form.addEventListener('reset', () => {
   filterCourses();
 });
 // Route links still work after narrowing the shelf: reveal their destination.
-function revealAnchor() {
-  const target = cards.find(card => `#${card.id}` === location.hash);
+function revealAnchor(hash = location.hash) {
+  const target = cards.find(card => `#${card.id}` === hash);
   if (target?.hidden) {
     form.reset();
     target.scrollIntoView({ block: 'start' });
   }
 }
-window.addEventListener('hashchange', revealAnchor);
+// Reveal synchronously, including repeated links whose hash is unchanged.
+for (const link of document.querySelectorAll('a[href^="#"]')) {
+  link.addEventListener('click', () => revealAnchor(link.getAttribute('href')));
+}
+window.addEventListener('hashchange', () => revealAnchor());
 filterCourses();
 form.hidden = false;
 revealAnchor();
