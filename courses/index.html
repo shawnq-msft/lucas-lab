@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lucas Lab 精选 6 门外部交互课程：网络、电子、户外、ESP32、Arduino 与系统设计。带着预测去探索，用自己的话讲明白。">
+  <meta name="theme-color" content="#244f3d">
+  <title>交互课程书架 · Lucas Lab</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="courses.css">
+  <script type="module" src="app.mjs"></script>
+</head>
+<body>
+<a class="skip-link" href="#catalog">跳到课程书架</a>
+<header class="site-header wrap">
+  <a class="brand" href="../"><span class="brand-mark" aria-hidden="true">L.</span> LUCAS LAB <span class="brand-sub">好奇心实验室</span></a>
+  <nav aria-label="页面导航"><a href="#paths">怎么选课</a><a href="#sources">来源与说明</a></nav>
+</header>
+<main class="wrap">
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <p class="eyebrow">THE INTERACTIVE SHELF / 交互课程书架</p>
+      <h1 id="page-title">不只看懂，<br>还要<span>动手弄明白。</span></h1>
+      <p class="intro">从一条网络请求，到一块会感知的电路板。这里收集 6 门外部交互课程，配上中文探索任务：先做一个预测，再去原站操作，最后用自己的话解释。</p>
+      <div class="hero-links"><a class="button primary" href="#catalog">挑一门开始 <span aria-hidden="true">↓</span></a><a class="text-link" href="#paths">还没想好？看看学习路线 ↗</a></div>
+    </div>
+    <aside class="field-note" aria-label="探索方法">
+      <p class="note-index">FIELD NOTE / 01</p>
+      <h2>把“我看过了”<br>变成“我能解释”。</h2>
+      <ol><li><b>01</b><span><strong>先预测</strong>动手前，写下会发生什么。</span></li><li><b>02</b><span><strong>只改一件事</strong>观察变化，保留反例。</span></li><li><b>03</b><span><strong>讲给别人听</strong>用图或三句话说出原因。</span></li></ol>
+      <p class="note-foot">纸笔在手，比多开十个标签页更有用。</p>
+    </aside>
+  </section>
+
+  <aside class="boundary" aria-label="打开前请知道">
+    <span class="boundary-label">打开前请知道</span>
+    <p>这里是<strong>中文导学，不是完整课程翻译</strong>。交互内容由外部原站提供，需要联网；默认内容以英语为主，语言选项以原站为准。点击课程会在新标签页打开，不在 Lucas Lab 内运行。学习进度若有保存，属于原站外部域名，本站不记录或同步。</p>
+  </aside>
+
+  <section id="paths" class="paths section" aria-labelledby="paths-title">
+    <div class="section-heading"><div><p class="eyebrow">FIND YOUR THREAD</p><h2 id="paths-title">从一个问题，走出一条路线</h2></div><p>路线和星级均为 Lucas Lab 编辑推荐，<br>不是原作者的难度分级，也不是必修顺序。</p></div>
+    <div class="path-grid">
+      <article class="path"><span class="path-number">路线 A / 造一个小东西</span><h3>让想法接上电</h3><p><a href="#electronics">电子基础</a> → <a href="#arduino">Arduino</a> → <a href="#esp32">ESP32</a></p><p class="muted">先懂回路，再看输入输出，最后接触无线连接。已有单片机经验？可以直接从 ESP32 开始。</p></article>
+      <article class="path"><span class="path-number">路线 B / 追一条消息</span><h3>网页背后发生了什么</h3><p><a href="#protocol">网络协议探索</a> → <a href="#scale">系统设计</a></p><p class="muted">先跟着数据包走一遍，再想象很多人同时访问时，服务器与数据库会遇到什么问题。</p></article>
+      <article class="path"><span class="path-number">路线 C / 做好出发准备</span><h3>先安全，再谈野外技能</h3><p><a href="#backcountry">户外基础</a>：迷路 → 装备 → 导航</p><p class="muted">和成人一起先做纸上情景推演，再考虑合规、有人带领的实地练习。不以冒险检验学习成果。</p></article>
+    </div>
+  </section>
+
+  <section id="catalog" class="section" aria-labelledby="catalog-title">
+    <div class="section-heading"><div><p class="eyebrow">SIX DOORS TO EXPLORE</p><h2 id="catalog-title">选一扇门，带着问题进去</h2></div><p>★ 入门：从现象开始 · ★★ 进阶：连接多个概念<br>★★★ 挑战：讨论取舍与边界；不按年龄设限。</p></div>
+    <form id="filters" class="filters" hidden aria-label="筛选课程">
+      <label for="category">探索方向<select id="category" name="category"><option value="all">全部方向</option><option value="hardware">电子与硬件</option><option value="network">网络与系统</option><option value="outdoor">户外与安全</option></select></label>
+      <label for="difficulty">推荐难度<select id="difficulty" name="difficulty"><option value="all">全部难度</option><option value="1">★ 入门</option><option value="2">★★ 进阶</option><option value="3">★★★ 挑战</option></select></label>
+      <button id="reset-filters" type="reset">重置筛选</button><p id="result-count" role="status" aria-live="polite" aria-atomic="true">显示 6 / 6 门课程</p>
+    </form>
+    <noscript><p class="noscript-note">JavaScript 未启用：下面 6 门课程与全部导学仍可直接阅读，原站链接照常可用。</p></noscript>
+    <p id="empty" class="empty" hidden>暂时没有符合条件的课程。试试其他方向，或重置筛选查看全部 6 门。</p>
+    <div class="course-grid">
+      <article class="course-card" id="protocol" data-category="network" data-difficulty="1">
+        <div class="card-top"><span class="course-index">01 / NETWORK</span><span class="badge">★ 入门</span></div>
+        <div class="mini-diagram" aria-hidden="true"><span>浏览器</span><i>→</i><span>DNS</span><i>→</i><span>服务器</span></div>
+        <p class="course-original">Protocol Explorer</p><h3>一条请求的旅行</h3><p class="course-summary">网页不是“突然出现”的。沿着数据包时间线，看看名字如何变成地址、连接如何建立、内容如何送达。</p>
+        <p class="topics">探索内容：HTTP · DNS · TCP · 数据包时间线</p><p class="prereq"><strong>先会什么</strong> 会打开网页；知道浏览器与网站不是同一回事。</p>
+        <dl class="prompts"><div><dt>动手做</dt><dd>打开原站的请求演示，沿时间线找到 DNS 查询、TCP 建连与 HTTP 请求，并在纸上画箭头。</dd></div><div><dt>先预测</dt><dd>如果还不知道域名对应的地址，HTTP 请求能直接送到正确服务器吗？写下你预计的先后顺序。</dd></div><div><dt>讲清楚</dt><dd>用“查地址—建连接—提请求”解释这次演示。再说明：这是一条教学路径，不代表所有缓存与协议场景都相同。</dd></div></dl>
+        <p class="takeaway">带走一张图 / 标有 DNS、TCP、HTTP 的请求路线图</p><a class="original-link" href="https://protocol-explorer-alpha.vercel.app" target="_blank" rel="noopener noreferrer">打开原站课程 <span>新标签页 ↗</span></a>
+      </article>
+
+      <article class="course-card" id="electronics" data-category="hardware" data-difficulty="1">
+        <div class="card-top"><span class="course-index">02 / ELECTRONICS</span><span class="badge">★ 入门</span></div>
+        <div class="mini-diagram circuit" aria-hidden="true"><span>电压 V</span><i>→</i><span>电流 I</span><i>↔</i><span>电阻 R</span></div>
+        <p class="course-original">Electronics 101</p><h3>从一个闭合回路开始</h3><p class="course-summary">灯为什么亮？从开路、闭路和导体出发，把电压、电流、电阻与看得见的电路现象连起来。</p>
+        <p class="topics">探索内容：电路类型 · 串并联电池 · AC/DC · 面包板 · 万用表 · Kirchhoff 定律</p><p class="prereq"><strong>先会什么</strong> 认识电池与灯；愿意先画出一条完整回路。</p>
+        <dl class="prompts"><div><dt>动手做</dt><dd>先在原站比较开路与闭路，再观察串联、并联的连接方式。画出电流能够经过的路径。</dd></div><div><dt>先预测</dt><dd>在电压保持不变的理想简单电路中，把电阻增大，电流会变大还是变小？用 V、I、R 说出依据。</dd></div><div><dt>讲清楚</dt><dd>为什么“接了两根线”不一定构成回路？解释电压与电流的区别，再指出串联与并联的一处不同。</dd></div></dl>
+        <p class="safety">实物边界：只做成人确认的低压电池实验，不碰市电；不能把万用表电流档直接跨接电池两端。</p>
+        <p class="takeaway">带走一张图 / 一个闭合回路 + 一条预测依据</p><a class="original-link" href="https://electronics-101-six.vercel.app" target="_blank" rel="noopener noreferrer">打开原站课程 <span>新标签页 ↗</span></a>
+      </article>
+
+      <article class="course-card" id="backcountry" data-category="outdoor" data-difficulty="1">
+        <div class="card-top"><span class="course-index">03 / OUTDOORS</span><span class="badge">★ 入门 · 成人陪同</span></div>
+        <div class="mini-diagram outdoor" aria-hidden="true"><span>停下</span><i>→</i><span>评估</span><i>→</i><span>求助</span></div>
+        <p class="course-original">Backcountry 101</p><h3>出发之前，先学会安全</h3><p class="course-summary">19 节户外主题涉及火、水、绳结、天幕、地图指南针、迷路、装备与蘑菇。先学风险判断，不把网页当生存许可证。</p>
+        <p class="topics">建议先看：迷路应对 · 装备清单 · 地图与指南针导航</p><p class="prereq"><strong>先会什么</strong> 与成人约定出行计划和求助方式；知道不确定时要停下来求助。</p>
+        <dl class="prompts"><div><dt>动手做</dt><dd>与成人读完迷路和装备相关内容，做一次室内情景演练：天快黑、手机信号差，你会留下哪些信息、优先检查哪些装备？</dd></div><div><dt>先预测</dt><dd>“沿看起来像路的方向继续走”一定更容易获救吗？先写风险，再与课程中的迷路应对原则对照。</dd></div><div><dt>讲清楚</dt><dd>向同行人说明出发前的路线、折返点与失联约定；解释为什么净水过滤与安全饮用不能画等号。</dd></div></dl>
+        <p class="safety"><strong>安全红线：</strong>这不是可食用鉴定指南；不食用任何未可靠鉴定的植物或蘑菇。过滤不等于消毒，饮水处理需合适的消毒步骤。儿童不得独自生火或用刀；遵守当地禁火规定。实地活动须成人带领，网页不能替代专业指导。</p>
+        <p class="takeaway">带走一张纸 / 与成人确认的出行与求助清单</p><a class="original-link" href="https://backcountry-101.vercel.app" target="_blank" rel="noopener noreferrer">打开原站课程 <span>新标签页 ↗</span></a>
+      </article>
+
+      <article class="course-card" id="arduino" data-category="hardware" data-difficulty="1">
+        <div class="card-top"><span class="course-index">04 / ARDUINO</span><span class="badge">★ 入门</span></div>
+        <div class="mini-diagram circuit" aria-hidden="true"><span>输入</span><i>→</i><span>程序</span><i>→</i><span>输出</span></div>
+        <p class="course-original">Learn Arduino</p><h3>认识一块开发板</h3><p class="course-summary">围绕 Uno / ATmega328P 的入门 3D 课程。先在模型中认清板子与连接，再把“输入—处理—输出”说成一个完整故事。</p>
+        <p class="topics">探索内容：Uno 开发板 · ATmega328P · 3D 入门交互</p><p class="prereq"><strong>先会什么</strong> 理解闭合回路；知道程序可以控制硬件。</p>
+        <dl class="prompts"><div><dt>动手做</dt><dd>在原站观察 3D 开发板，对照界面标注，找一找主控芯片、USB 接口与引脚区域，画一张位置草图。</dd></div><div><dt>先预测</dt><dd>一块外观相似的开发板，能直接照搬相同接线吗？先列出你认为要核对的型号、电压与引脚信息。</dd></div><div><dt>讲清楚</dt><dd>用一个按钮控制灯的例子说明：什么是输入，程序要做什么判断，什么是输出？这是导学设问，不代表原站有该实作关卡。</dd></div></dl>
+        <p class="safety">实物边界：这里的对象是 Uno / ATmega328P，不代表所有 Arduino 兼容板。先核对板型和引脚图，断电接线，勿短接电源。</p>
+        <p class="takeaway">带走一张图 / 标有主控、接口、引脚区域的板卡草图</p><a class="original-link" href="https://learn-arduino-red.vercel.app" target="_blank" rel="noopener noreferrer">打开原站课程 <span>新标签页 ↗</span></a>
+      </article>
+
+      <article class="course-card" id="esp32" data-category="hardware" data-difficulty="2">
+        <div class="card-top"><span class="course-index">05 / ESP32</span><span class="badge">★★ 进阶</span></div>
+        <div class="mini-diagram circuit" aria-hidden="true"><span>传感器</span><i>→</i><span>ESP32</span><i>→</i><span>执行器</span></div>
+        <p class="course-original">Learn ESP32</p><h3>让电路感知，再作出响应</h3><p class="course-summary">20 节课程串起 GPIO、无线连接与常见外设。从灯和传感器出发，理解开发板如何把程序变成真实世界的变化。</p>
+        <p class="topics">探索内容：GPIO · WiFi · Bluetooth · LED · 传感器 · 电机 · 水泵</p><p class="prereq"><strong>先会什么</strong> 电源、地与信号的区别；能读简单程序，并理解输入与输出。</p>
+        <dl class="prompts"><div><dt>动手做</dt><dd>先看原站 GPIO 与 LED 相关内容，画出“信号从哪个引脚出去”的路径，再找一个传感器主题，补画输入方向。</dd></div><div><dt>先预测</dt><dd>如果传感器超过阈值就启动水泵，读数在阈值附近来回波动时会怎样？先画预测曲线，再思考是否需要不同的启停阈值。</dd></div><div><dt>讲清楚</dt><dd>区分信号线与供电线：为什么 GPIO 能发送控制信号，却不应直接给电机或水泵供电？上面的水泵策略是延伸设问，不是原站功能承诺。</dd></div></dl>
+        <p class="safety"><strong>接线前必读：</strong>ESP32 GPIO 是 3.3V 逻辑，不能直接接 5V 信号；实际板型与引脚分配可能不同，须查对应引脚图。电机、水泵需合适的驱动与独立供电设计，由成人核对；勿用 GPIO 直接驱动负载。</p>
+        <p class="takeaway">带走一张图 / 传感器 → 判断 → 驱动器 → 执行器</p><a class="original-link" href="https://learn-esp32.vercel.app" target="_blank" rel="noopener noreferrer">打开原站课程 <span>新标签页 ↗</span></a>
+      </article>
+
+      <article class="course-card" id="scale" data-category="network" data-difficulty="3">
+        <div class="card-top"><span class="course-index">06 / SYSTEM DESIGN</span><span class="badge">★★★ 挑战</span></div>
+        <div class="mini-diagram" aria-hidden="true"><span>请求</span><i>→</i><span>服务</span><i>→</i><span>数据库</span></div>
+        <p class="course-original">Designed to Scale</p><h3>如果一万人同时点开呢？</h3><p class="course-summary">从请求经过浏览器、DNS、连接、服务器与数据库开始，再进入扩展、存储和安全。重点不是记术语，而是解释选择的代价。</p>
+        <p class="topics">探索内容：请求链路 · 系统扩展 · 数据存储 · 安全</p><p class="prereq"><strong>先会什么</strong> 先理解网络请求；知道服务器处理请求、数据库保存和读取数据。</p>
+        <dl class="prompts"><div><dt>动手做</dt><dd>在原站跟一次请求的完整旅程，画出浏览器到数据库的链路。在你觉得可能“排队”的位置标一个问号。</dd></div><div><dt>先预测</dt><dd>服务器增加一倍，响应速度就一定翻倍吗？假设瓶颈在数据库，先写下你预计不会被解决的问题。</dd></div><div><dt>讲清楚</dt><dd>选扩展、存储或安全中的一个设计，说出它解决了什么问题、引入什么成本，以及什么时候不值得用。</dd></div></dl>
+        <p class="takeaway">带走一张表 / 一个设计选择的收益、成本与适用边界</p><a class="original-link" href="https://designed-to-scale.vercel.app" target="_blank" rel="noopener noreferrer">打开原站课程 <span>新标签页 ↗</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section class="reflection section" aria-labelledby="reflection-title"><p class="eyebrow">CLOSE THE LOOP</p><h2 id="reflection-title">关掉网页前，留下一点自己的发现。</h2><p>在纸上补完这三句话：<strong>我原来以为…… / 实际观察到…… / 我还想验证……</strong></p><p>能讲清一个因果关系，比快速翻完全部页面更重要。本站不保存答案、不统计课程完成度；纸笔记录由你自己保管。</p></section>
+  <section id="sources" class="sources section" aria-labelledby="sources-title"><p class="eyebrow">CREDITS & BOUNDARIES</p><h2 id="sources-title">好课程，归原作者；好问题，留给你。</h2><div class="source-grid"><div><h3>原作与推荐来源</h3><p>上述交互课程作者：<a href="https://x.com/DilumSanjaya" target="_blank" rel="noopener noreferrer">Dilum Sanjaya ↗（新标签页）</a>。课程内容、界面与相关权利归原作者或相应权利人；本站不托管、嵌入或复制原课程及其素材。</p><p>发现线索：凿空创想，2026-11-17，<a href="https://mp.weixin.qq.com/s/9mUdMT78YCpWuuqDSKU5QQ" target="_blank" rel="noopener noreferrer">《古法编程大师的AI在线交互课程》↗（新标签页）</a>。</p></div><div><h3>本站做什么、不做什么</h3><p>中文介绍、路线、星级与“动手做 / 先预测 / 讲清楚”均为 Lucas Lab 编辑导学，不是原作者提供的中文课程或认证。设问可能是纸上延伸，不保证原站有对应按钮或模拟功能。</p><p>原站访问和内容可能变化，语言选项、进度保存与隐私规则以各原站为准。这里不能离线运行外部课程，不代替安全培训或实物实验验证。</p></div></div></section>
+</main>
+<footer class="site-footer wrap"><a href="../">← 返回 Lucas Lab</a><span>保持好奇，也保留判断。 / KEEP ASKING WHY.</span></footer>
+</body>
+</html>
