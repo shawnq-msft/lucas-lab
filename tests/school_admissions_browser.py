@@ -42,7 +42,9 @@ try:
             assert page.locator('#sources li').count() == 12
             page.locator('.page-end a').click()
             page.wait_for_load_state('networkidle')
-            assert '今天，探索什么' in page.locator('h1').inner_text()
+            assert page.title().startswith('Lucas Lab')
+            assert page.locator('h1').is_visible()
+            assert page.locator('.entry-link[href="school-admissions/"]').count() == 1
             print(f'PASS summary navigation, details, citations and overflow at {width}x{height}')
             page.close()
         browser.close()
