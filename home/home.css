@@ -1,0 +1,736 @@
+:root {
+  --paper: #f5f0e5;
+  --panel: #fffcf4;
+  --ink: #193d2f;
+  --muted: #526055;
+  --green: #20553d;
+  --line: #c9cbbb;
+  --orange: #a2452d;
+  --pale: #e7ecdf;
+  --warm: #f4dfaa;
+  --yellow: #edcc64;
+  --brass: #795b27;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-padding-top: 150px;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    16px/1.75 "Microsoft YaHei",
+    "PingFang SC",
+    sans-serif;
+}
+a {
+  color: inherit;
+  text-underline-offset: 4px;
+}
+button,
+input {
+  font: inherit;
+}
+button,
+a,
+input,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 4px;
+}
+[hidden] {
+  display: none !important;
+}
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 20px;
+  z-index: 10;
+  background: var(--panel);
+  padding: 12px;
+}
+.skip-link:focus {
+  top: 12px;
+}
+.masthead {
+  max-width: 1380px;
+  margin: auto;
+  padding: 20px 42px 18px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  border-bottom: 2px solid var(--ink);
+}
+.brand {
+  font:
+    700 33px/1.1 Georgia,
+    serif;
+  text-decoration: none;
+  letter-spacing: -1px;
+}
+.brand span {
+  display: block;
+  font:
+    12px/1.6 "Microsoft YaHei",
+    sans-serif;
+  letter-spacing: 3px;
+  margin-top: 8px;
+  color: var(--green);
+}
+.edition {
+  font:
+    11px/1.9 Consolas,
+    monospace;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-left: auto;
+}
+.header-link {
+  font-size: 13px;
+  text-decoration: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+main {
+  max-width: 1380px;
+  margin: auto;
+  padding: 0 42px;
+}
+.opening {
+  padding: 36px 0 34px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.kicker {
+  font:
+    11px/1.5 Consolas,
+    monospace;
+  letter-spacing: 2px;
+  color: var(--green);
+  margin: 0 0 16px;
+}
+h1 {
+  font:
+    800 clamp(38px, 4.7vw, 66px) / 1.23 "Songti SC",
+    "Noto Serif CJK SC",
+    SimSun,
+    serif;
+  letter-spacing: -1.3px;
+  margin: 0;
+}
+h1 em {
+  font-style: normal;
+  position: relative;
+  z-index: 0;
+  display: inline-block;
+}
+h1 em::after {
+  content: "";
+  position: absolute;
+  height: 0.22em;
+  bottom: 0.08em;
+  left: 0.02em;
+  right: 0.15em;
+  z-index: -1;
+  background: var(--yellow);
+  transform: rotate(-1.5deg);
+}
+.opening-note {
+  min-width: 260px;
+  color: var(--green);
+  margin: 0 4px 4px 0;
+}
+.opening-note p {
+  font-size: 19px;
+  line-height: 1.7;
+  margin: 10px 0 12px;
+  font-weight: 600;
+}
+.opening-note > span {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.opening-note > .note-label {
+  font:
+    10px/1.5 Consolas,
+    monospace;
+  letter-spacing: 2px;
+  color: var(--orange);
+}
+.browse {
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding: 18px 0 12px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 26px;
+}
+.browse-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.filters button {
+  min-height: 44px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid transparent;
+  padding: 8px 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.filters button {
+  border-color: var(--line);
+}
+.filters button:hover {
+  border-color: var(--green);
+}
+.filters button[aria-pressed="true"] {
+  color: var(--panel);
+  background: var(--green);
+  border-color: var(--green);
+}
+.filters button span {
+  font:
+    11px Consolas,
+    monospace;
+  opacity: 0.8;
+  margin-left: 6px;
+}
+.search-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.search-label > span {
+  white-space: nowrap;
+}
+.search-label input {
+  width: 230px;
+  max-width: 100%;
+  height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+  font-size: 14px;
+  color: var(--ink);
+}
+.result-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  min-height: 32px;
+}
+.result-line p {
+  font-size: 12px;
+  margin: 0;
+  color: var(--muted);
+}
+.reset {
+  font-size: 12px;
+  min-height: 44px;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  padding: 6px 0 6px 12px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.noscript {
+  font-size: 13px;
+}
+.catalog {
+  column-count: 3;
+  column-gap: 26px;
+  scroll-margin-top: 160px;
+}
+.entry {
+  display: inline-block;
+  vertical-align: top;
+  break-inside: avoid;
+  width: 100%;
+  margin: 0 0 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.entry figure {
+  margin: 0;
+  position: relative;
+  background: var(--warm);
+}
+.entry img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+}
+.algorithm-entry img {
+  aspect-ratio: 1.78;
+}
+.courses-entry img {
+  aspect-ratio: 1.55;
+}
+.entry figcaption {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 5px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.entry-copy {
+  padding: 23px 24px 20px;
+}
+.entry-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--green);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  margin: 0 0 15px;
+}
+.entry-meta > span:last-child {
+  color: var(--brass);
+}
+.entry h2 {
+  font:
+    700 28px/1.45 "Songti SC",
+    "Noto Serif CJK SC",
+    SimSun,
+    serif;
+  letter-spacing: -0.3px;
+  margin: 0 0 14px;
+  text-wrap: pretty;
+}
+.entry-copy > p:not(.entry-meta):not(.type-mark) {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 12px 0;
+}
+.topics {
+  display: flex;
+  gap: 6px 12px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--green);
+  margin: 18px 0;
+}
+.topics span + span {
+  position: relative;
+}
+.entry-copy > .caution {
+  font-size: 12px !important;
+  line-height: 1.75;
+}
+.entry-link {
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  text-decoration: none;
+  color: var(--green);
+  font-size: 13px;
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 12px;
+}
+.entry-link:hover {
+  text-decoration: underline;
+}
+.entry-link span {
+  font-size: 22px;
+  font-weight: 400;
+}
+.entry:focus-within {
+  border-color: var(--green);
+}
+.text-entry .entry-copy {
+  padding-top: 26px;
+}
+.type-figure {
+  margin: 20px 0 24px;
+  font:
+    18px/1.4 Consolas,
+    "Microsoft YaHei",
+    monospace;
+  color: var(--green);
+  padding: 16px 0;
+  border-top: 1px dashed var(--line);
+  border-bottom: 1px dashed var(--line);
+}
+.type-figure i {
+  font-style: normal;
+  color: var(--orange);
+}
+.array-art {
+  display: flex;
+  gap: 6px;
+  margin: 22px 0 28px;
+}
+.array-art span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font:
+    17px Consolas,
+    monospace;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--line);
+  background: var(--pale);
+}
+.array-art span:nth-child(3) {
+  border-color: var(--green);
+}
+.warm {
+  background: var(--warm);
+}
+.type-mark {
+  font:
+    22px/1.6 Consolas,
+    monospace;
+  letter-spacing: -0.7px;
+  margin: 30px 0;
+  color: var(--orange);
+}
+.type-mark span {
+  color: var(--green);
+}
+.family {
+  background: #e8ede2;
+}
+.entry details {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 14px 0;
+}
+.entry summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: list-item;
+  padding: 9px 0;
+  color: var(--green);
+}
+.entry details p {
+  margin: 8px 0 12px;
+}
+.empty-state {
+  text-align: center;
+  padding: 56px 20px 70px;
+}
+.empty-state h2 {
+  font-size: 24px;
+}
+.empty-state p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.empty-state button {
+  min-height: 44px;
+  background: var(--green);
+  color: var(--panel);
+  border: 0;
+  border-radius: 3px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+.reading-notes {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr;
+  gap: 30px;
+  padding: 30px 0;
+  border-top: 1px solid var(--ink);
+  margin: 20px 0 0;
+}
+.reading-notes h2 {
+  font:
+    700 22px/1.5 "Songti SC",
+    SimSun,
+    serif;
+  margin: 0;
+}
+.reading-notes h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+.reading-notes p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+footer {
+  max-width: 1320px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 36px 38px;
+  font-size: 11px;
+  color: var(--muted);
+}
+footer a {
+  text-decoration: none;
+}
+button:disabled,
+input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+@media (min-width: 1500px) {
+  .catalog {
+    column-gap: 28px;
+  }
+  .entry {
+    margin-bottom: 28px;
+  }
+}
+@media (max-width: 1100px) {
+  .browse-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .search-label {
+    width: 100%;
+  }
+  .search-label input {
+    width: 100%;
+  }
+  .filters {
+    gap: 4px;
+  }
+  .catalog {
+    column-count: 2;
+  }
+  .reading-notes {
+    grid-template-columns: 1fr 1fr;
+  }
+  .reading-notes h2 {
+    grid-column: 1/-1;
+  }
+  .catalog {
+    scroll-margin-top: 210px;
+  }
+}
+@media (max-width: 640px) {
+  .masthead {
+    padding: 16px 20px 12px;
+    gap: 12px;
+  }
+  .brand {
+    font-size: 29px;
+  }
+  .edition {
+    display: none;
+  }
+  .header-link {
+    margin-left: auto;
+    font-size: 12px;
+  }
+  main {
+    padding: 0 20px;
+  }
+  .opening {
+    display: block;
+    padding: 18px 0 18px;
+  }
+  .opening h1 {
+    font-size: clamp(36px, 8.7vw, 52px);
+    letter-spacing: -1.2px;
+  }
+  .opening-note {
+    display: none;
+  }
+  .opening-note br {
+    display: none;
+  }
+  .opening-note span {
+    margin: 3px 0 0;
+  }
+  .kicker {
+    font-size: 9px;
+    letter-spacing: 1.6px;
+  }
+  .browse {
+    position: static;
+    padding-top: 14px;
+    margin-bottom: 20px;
+  }
+  .browse-row {
+    gap: 10px;
+  }
+  .filters {
+    gap: 4px;
+  }
+  .filters button {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  .filters button span {
+    font-size: 10px;
+    margin-left: 4px;
+  }
+  .search-label > span {
+    font-size: 11px;
+  }
+  .search-label input {
+    min-width: 0;
+    font-size: 13px;
+  }
+  .catalog {
+    column-count: 1;
+    scroll-margin-top: 16px;
+  }
+  .entry {
+    margin-bottom: 20px;
+  }
+  .entry-copy {
+    padding: 18px 22px;
+  }
+  .entry-meta {
+    margin-bottom: 10px;
+  }
+  .entry:first-child img {
+    aspect-ratio: 1.8;
+    object-position: center 55%;
+  }
+  .entry h2 {
+    font-size: 27px;
+  }
+  .reading-notes {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-top: 24px;
+  }
+  .reading-notes h2 {
+    grid-column: auto;
+  }
+  footer {
+    padding: 20px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .result-line {
+    margin-top: 3px;
+  }
+  html {
+    scroll-padding-top: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media print {
+  .entry details::details-content {
+    content-visibility: visible !important;
+    display: block !important;
+  }
+  .browse,
+  .skip-link,
+  .header-link {
+    display: none;
+  }
+  .masthead {
+    padding: 0 0 16px;
+  }
+  .opening {
+    padding: 20px 0;
+  }
+  .opening-note {
+    display: none;
+  }
+  .catalog {
+    column-count: 2;
+  }
+  .entry[hidden] {
+    display: inline-block !important;
+  }
+  .entry {
+    break-inside: avoid;
+  }
+  .entry details {
+    display: block;
+  }
+  .entry details > * {
+    display: block !important;
+  }
+  .entry img {
+    max-height: 160px;
+    object-fit: contain;
+  }
+  .entry-copy {
+    padding: 14px;
+  }
+  .entry-copy > p:not(.entry-meta):not(.type-mark) {
+    font-size: 12pt;
+  }
+  .entry h2 {
+    font-size: 18pt;
+  }
+  .entry figcaption,
+  .entry-copy > .caution,
+  .entry-meta,
+  .topics,
+  .entry-link {
+    font-size: 12pt !important;
+  }
+  body {
+    background: white;
+  }
+  main,
+  footer {
+    padding: 0;
+  }
+  .reading-notes {
+    display: block;
+  }
+  .reading-notes p,
+  .reading-notes h3,
+  .entry details {
+    font-size: 12pt;
+  }
+  .reading-notes > div {
+    margin-top: 16px;
+  }
+  .empty-state {
+    display: none !important;
+  }
+}
