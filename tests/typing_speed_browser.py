@@ -38,7 +38,7 @@ with sync_playwright() as pw:
     def raw():
         return float(gauge.get_attribute('data-hpm'))
 
-    for scene in ['supply', 'defense', 'assault']:
+    for scene in ['supply', 'defense', 'assault', 'mining', 'rescue', 'race']:
         start(scene)
         check(scene + ' visible gauge', gauge.is_visible())
         check(scene + ' actual zero not configured speed', raw() == 0 and page.locator('#hpm').inner_text() == '0')

@@ -23,7 +23,7 @@ class SiteBuild(unittest.TestCase):
         home=(ROOT/'index.html').read_text()
         self.assertIn('href="typing/"',home)
         self.assertIn('Cookie',home)
-        for scene in ['星矿补给站','太空防御','太空反攻']:
+        for scene in ['星矿补给站','太空防御','星际反击','矿带采集','太空救援','星际竞速']:
             self.assertIn(scene,home)
         self.assertNotIn('星际修桥',home)
         self.assertIn('起始速度',home)

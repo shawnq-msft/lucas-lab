@@ -38,9 +38,15 @@ with sync_playwright() as p:
     boom=page.evaluate('sample()');assert boom>0.00001, boom
     page.wait_for_timeout(600);page.evaluate("a.setEffects(false);a.effect('laser')");page.wait_for_timeout(80)
     muted=page.evaluate('sample()');assert muted<0.00001, muted
+    completion_peaks={}
+    page.evaluate('a.setEffects(true)')
+    for event in ['load','laser','missile','drill','tether','boost']:
+        page.evaluate('(name)=>a.effect(name)',event)
+        value=peak(550);assert value>0.00001,(event,value)
+        completion_peaks[event]=value
     page.evaluate('a.setMusic(true)');page.wait_for_timeout(370)
     resumed=peak();assert resumed>0.00001, resumed
     page.evaluate('a.stop()');page.wait_for_timeout(700)
     stopped=page.evaluate('sample()');assert stopped<0.00001, stopped
-    print(json.dumps({'real_audio_checks':7,'loop_rms':loop,'music_rms':music,'music_off_rms':quiet,'explosion_rms':boom,'effects_off_rms':muted,'music_resumed_rms':resumed,'stopped_rms':stopped,'speech_api':page.evaluate('a.hasSpeech()'),'installed_voices':page.evaluate('speechSynthesis.getVoices().length')},ensure_ascii=False))
+    print(json.dumps({'real_audio_checks':7+len(completion_peaks),'completion_effect_rms':completion_peaks,'loop_rms':loop,'music_rms':music,'music_off_rms':quiet,'explosion_rms':boom,'effects_off_rms':muted,'music_resumed_rms':resumed,'stopped_rms':stopped,'speech_api':page.evaluate('a.hasSpeech()'),'installed_voices':page.evaluate('speechSynthesis.getVoices().length')},ensure_ascii=False))
     page.evaluate('a.dispose()');browser.close()

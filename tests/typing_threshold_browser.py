@@ -7,7 +7,7 @@ checks=0
 with sync_playwright() as pw:
     chrome=next((Path.home()/'.cache/ms-playwright').glob('*/chrome-linux64/chrome'))
     browser=pw.chromium.launch(executable_path=str(chrome),args=['--no-sandbox'])
-    for scene in ['supply','defense','assault']:
+    for scene in ['supply','defense','assault','mining','rescue','race']:
         page=browser.new_page();page.clock.install()
         # Repeatable short targets; only RNG is fixed, never scores or game state.
         page.add_init_script('crypto.getRandomValues = a => { a.fill(0); return a; }')

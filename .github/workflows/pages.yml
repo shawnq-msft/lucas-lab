@@ -24,6 +24,8 @@ jobs:
           python3 -m unittest discover -s tests -p test_build.py -v
           HOME_REQUIRE_ASSETS=1 python3 -m unittest discover -s tests -p test_home.py -v
           node --test tests/home.test.mjs
+          node --test tests/typing_expansion.test.mjs
+          python3 -m unittest discover -s tests -p test_typing_expansion_integration.py -v
           python3 -m unittest discover -s sources/practice -p test_engine.py -v
           python3 -m unittest discover -s sources/practice -p test_advanced.py -v
           python3 -m unittest discover -s sources/practice -p test_combinations.py -v
@@ -50,6 +52,7 @@ jobs:
           python3 tests/typing_threshold_browser.py
           python3 tests/typing_speed_browser.py
           python3 tests/typing_audio_browser.py
+          python3 tests/typing_expansion_browser.py
           python3 tests/computer_browser.py
           python3 tests/mali_browser.py
           python3 tests/camp101_browser.py

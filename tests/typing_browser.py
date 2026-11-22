@@ -15,7 +15,7 @@ with sync_playwright() as pw:
     page=context.new_page();errors=[];page.on('pageerror',lambda e: errors.append(str(e)))
     page.clock.install();page.goto(BASE)
     check('missing device voice warning','英语语音' in page.locator('#audioStatus').inner_text())
-    check('illustrated mission chooser',page.locator('[data-mission]').count()==3 and page.locator('#chooser').is_visible())
+    check('illustrated mission chooser',page.locator('[data-mission]').count()==6 and page.locator('#chooser').is_visible())
     out=Path('verification');out.mkdir(exist_ok=True)
     page.screenshot(path=str(out/'typing-v3-chooser.png'),full_page=True)
     field=page.locator('#entry')

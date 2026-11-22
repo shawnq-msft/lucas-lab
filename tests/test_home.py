@@ -85,7 +85,7 @@ class HomeMagazine(unittest.TestCase):
                 self.assertEqual(record['bytes'], len(data))
     def test_visible_boundaries_and_original_content(self):
         text, _ = self.parse()
-        for phrase in ['第一组：基础六关', '第二组：综合四题', '第三组：算法拓展四题', 'A/B题目版本', '归并', '快速', '堆排序', '递归', '二叉树', '博弈', '星矿补给站', '太空防御', '太空反攻', '起始速度', 'Cookie', '学校AI赛完整附件仍待核实', '非官方真题', '不是工程设计或真实运行模拟', '不是完整装配教程、采购报价或运动能力承诺', '非招生通知', '2026 年比赛总体方案', '2026 年 10 月家长考情分享', '六套互动课程', 'Dilum Sanjaya', '外部网站', '需要联网', '进度不与 Lucas Lab 同步', '户外内容仅作安全常识启蒙', '首次独立记录', '本站没有账号', '旧站记录不会自动迁移', '不是密码保护']:
+        for phrase in ['第一组：基础六关', '第二组：综合四题', '第三组：算法拓展四题', 'A/B题目版本', '归并', '快速', '堆排序', '递归', '二叉树', '博弈', '星矿补给站', '太空防御', '星际反击', '矿带采集', '太空救援', '星际竞速', '起始速度', 'Cookie', '学校AI赛完整附件仍待核实', '非官方真题', '不是工程设计或真实运行模拟', '不是完整装配教程、采购报价或运动能力承诺', '非招生通知', '2026 年比赛总体方案', '2026 年 10 月家长考情分享', '六套互动课程', 'Dilum Sanjaya', '外部网站', '需要联网', '进度不与 Lucas Lab 同步', '户外内容仅作安全常识启蒙', '首次独立记录', '本站没有账号', '旧站记录不会自动迁移', '不是密码保护']:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, text)
         # Safety/evidence boundaries stay outside optional details.

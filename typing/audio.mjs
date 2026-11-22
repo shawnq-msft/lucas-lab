@@ -79,6 +79,9 @@ export function createAudio(env=globalThis){
    case 'missile':tone(120,t,.28,.35,'sawtooth',850);tone(70,t,.35,.15,'triangle',35);break;
    case 'explosion':tone(100,t,.45,.5,'sawtooth',18);tone(173,t+.018,.28,.3,'square',27);tone(720,t,.12,.12,'triangle',43);break;
    case 'load':tone(523.25,t,.12,.27,'sine');tone(783.99,t+.12,.18,.23,'sine');break;
+   case 'drill':tone(140,t,.3,.23,'sawtooth',65);tone(1046,t+.2,.14,.2,'sine');break;
+   case 'tether':tone(392,t,.12,.2,'sine');tone(523,t+.12,.14,.22,'sine');tone(659,t+.26,.17,.2,'sine');break;
+   case 'boost':tone(210,t,.3,.24,'triangle',1100);tone(880,t+.2,.18,.15,'sine',1760);break;
    case 'error':tone(170,t,.14,.2,'triangle',100);break;
   }
  }
