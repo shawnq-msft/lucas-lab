@@ -55,6 +55,7 @@ jobs:
           python3 tests/typing_speed_browser.py
           python3 tests/typing_audio_browser.py
           python3 tests/typing_expansion_browser.py
+          python3 tests/typing_3d_browser.py
           python3 tests/computer_browser.py
           python3 tests/mali_browser.py
           python3 tests/camp101_browser.py
