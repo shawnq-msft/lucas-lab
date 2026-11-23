@@ -24,6 +24,13 @@ with sync_playwright() as p:
     page.goto(BASE)
     page.wait_for_function("document.querySelector('#search').disabled === false")
     assert page.locator('.entry:visible').count() == 11
+    bundle = page.locator('#programming-practice')
+    assert bundle.count() == 1, 'One homepage section for every Python competition practice'
+    assert bundle.locator('h2').inner_text() == '编程练习'
+    assert bundle.locator('nav a').evaluate_all('(xs)=>xs.map(x=>x.getAttribute("href"))') == ['python-exams/', 'ability/', 'practice/']
+    for link in bundle.locator('nav a').all():
+        assert link.is_visible() and link.bounding_box()['height'] >= 44
+        assert context.request.get(BASE + link.get_attribute('href')).status == 200
     original = page.locator('.entry-link').evaluate_all('(links) => links.map(link => link.getAttribute("href"))')
     assert len(original) == 11 and set(original) == EXPECTED
     for category, count in COUNTS.items():
