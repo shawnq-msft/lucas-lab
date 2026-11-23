@@ -1,0 +1,216 @@
+{
+  "exams": {
+    "A": {
+      "choices": {
+        "q1": {
+          "answer": 1,
+          "explanation": "键盘把按键传入计算机；其余主要输出信息。"
+        },
+        "q2": {
+          "answer": 2,
+          "explanation": "for 是循环关键字，其他名称可作为变量名。"
+        },
+        "q3": {
+          "answer": 2,
+          "explanation": "b 保存赋值时的整数3，之后修改a不改变b。"
+        },
+        "q4": {
+          "answer": 0,
+          "explanation": "17=5×3+2，整除为3，余数为2。"
+        },
+        "q5": {
+          "answer": 1,
+          "explanation": "input 返回字符串，int 转为整数，再加2。"
+        },
+        "q6": {
+          "answer": 0,
+          "explanation": "索引1和3是Y、H；停止位置5不包含。"
+        },
+        "q7": {
+          "answer": 2,
+          "explanation": "range(1,4)依次为1、2、3，和为6。"
+        },
+        "q8": {
+          "answer": 2,
+          "explanation": "append 在尾部加入一个元素；长度3，最后一个为6。"
+        }
+      },
+      "tasks": {
+        "t1": {
+          "solution": "luke.move(advance)\nluke.attack()\nluke.move(retreat)\nluke.press()",
+          "explanation": "只给luke发指令。先靠近敌人，攻击，再以负数后退到开关。",
+          "commonMistakes": [
+            "把全局move当成luke.move",
+            "攻击前移动到敌人所在格",
+            "负数理解成转身"
+          ]
+        },
+        "t2": {
+          "solution": "for step in steps:\n    move(step)\n    press()",
+          "explanation": "每段走完就按一次；for直接遍历距离列表。",
+          "commonMistakes": [
+            "循环外才按开关",
+            "把列表长度当每段距离"
+          ]
+        },
+        "t3": {
+          "solution": "i = 0\nwhile i < len(distances):\n    move(distances[i])\n    press()\n    i += 1",
+          "explanation": "索引从0开始，严格小于长度；每轮递增防止死循环。",
+          "commonMistakes": [
+            "忘记i递增",
+            "使用<=导致索引越界"
+          ]
+        },
+        "t4": {
+          "solution": "for record in records:\n    move(record[\"steps\"])\n    if record[\"open\"]:\n        press()",
+          "explanation": "移动总要执行；只有允许的格子才按。",
+          "commonMistakes": [
+            "对所有记录无条件press",
+            "把字符串键忘写引号"
+          ]
+        }
+      }
+    },
+    "B": {
+      "choices": {
+        "q1": {
+          "answer": 2,
+          "explanation": "不要提交密码或下载可疑附件，向可信老师核实。"
+        },
+        "q2": {
+          "answer": 1,
+          "explanation": "引号内为字符串str；无引号整数为int。此题是普通CPython阅读题，模拟游戏禁止双下划线访问。"
+        },
+        "q3": {
+          "answer": 0,
+          "explanation": "包含索引1、2、3，不包含4。"
+        },
+        "q4": {
+          "answer": 2,
+          "explanation": "4>2为真，4==5为假，not 后为真，and 结果为真。"
+        },
+        "q5": {
+          "answer": 2,
+          "explanation": "get 的缺键默认值是1，不会插入新键，所以长度仍是2。"
+        },
+        "q6": {
+          "answer": 0,
+          "explanation": "strip 去两端空格，split 按逗号拆成两个字符串。"
+        },
+        "q7": {
+          "answer": 0,
+          "explanation": "n依次7→3→1，两次循环后停止。"
+        },
+        "q8": {
+          "answer": 2,
+          "explanation": "最小1、最大4、总和8。"
+        }
+      },
+      "tasks": {
+        "t1": {
+          "solution": "for digit in tape[1:-1]:\n    move(int(digit))\n    press()",
+          "explanation": "[1:-1]去首尾，字符数字转整数后移动。",
+          "commonMistakes": [
+            "包含x或z导致int失败",
+            "直接把字符串交给move"
+          ]
+        },
+        "t2": {
+          "solution": "middle = route[1:-1]\nmiddle.reverse()\nfor step in middle:\n    move(step)\n    press()",
+          "explanation": "切片得到[1,2,3]，reverse原地变[3,2,1]，累计位置3、5、6。",
+          "commonMistakes": [
+            "将middle赋值为reverse返回值None",
+            "未去掉护栏编号"
+          ]
+        },
+        "t3": {
+          "solution": "for name in order:\n    move(lengths.get(name, 1))\n    press()",
+          "explanation": "get允许缺键时使用备用距离1，累计2、3、6。",
+          "commonMistakes": [
+            "直接索引missing触发缺键",
+            "get缺省为None"
+          ]
+        },
+        "t4": {
+          "solution": "i = 0\nwhile i < len(commands):\n    if commands[i] == \"M\":\n        move(1)\n    else:\n        press()\n    i += 1",
+          "explanation": "while逐字符，P不移动；前两次M后在2处按开关。",
+          "commonMistakes": [
+            "把P也当移动",
+            "i只在某个分支递增"
+          ]
+        }
+      }
+    },
+    "C": {
+      "choices": {
+        "q1": {
+          "answer": 0,
+          "explanation": "通常所说RAM是易失性存储，断电会失去未保存数据。"
+        },
+        "q2": {
+          "answer": 2,
+          "explanation": "条件为假执行else，最后一行在分支外总会执行。"
+        },
+        "q3": {
+          "answer": 1,
+          "explanation": "/ 是真除法得到浮点4.5；// 得到整数4。"
+        },
+        "q4": {
+          "answer": 0,
+          "explanation": "二进制110&011=010；100|001=101；1左移2位为100。"
+        },
+        "q5": {
+          "answer": 2,
+          "explanation": "负步长逆序得到edcba，upper 转为大写。"
+        },
+        "q6": {
+          "answer": 3,
+          "explanation": "b和a指向同一列表；c是切片副本，长度保持2。"
+        },
+        "q7": {
+          "answer": 1,
+          "explanation": "a更新为3，b为3，和为6。"
+        },
+        "q8": {
+          "answer": 2,
+          "explanation": "continue跳过本次循环后面的语句，因此0+1+3+4=8。"
+        }
+      },
+      "tasks": {
+        "t1": {
+          "solution": "hero.move(heroEast)\nhero.turnRight()\nhero.move(heroSouth)\nhero.turnRight()\nhero.move(heroWest)\nhero.press()\nluke.move(lukeEast)\nluke.turnLeft()\nluke.move(lukeNorth)\nluke.press()",
+          "explanation": "东朝右转为南，再右转为西；luke从东左转为北，两者独立。",
+          "commonMistakes": [
+            "混淆left/right",
+            "用全局turn改变luke",
+            "忽略墙格"
+          ]
+        },
+        "t2": {
+          "solution": "for i in range(len(steps)):\n    move(steps[i])\n    if flags[i] & 1:\n        press()",
+          "explanation": "&1检验最低位：1、0、3分别允许、不允许、允许。",
+          "commonMistakes": [
+            "把标志3误认为不能按",
+            "用&0导致全为假"
+          ]
+        },
+        "t3": {
+          "solution": "route.append(extra)\nroute.pop(0)\nfor step in route:\n    move(step)\n    press()",
+          "explanation": "先[1,2,3]再删除首项为[2,3]。每次评测重新复制输入。",
+          "commonMistakes": [
+            "pop()删除尾项",
+            "把append返回值None当列表"
+          ]
+        },
+        "t4": {
+          "solution": "for command in text.split():\n    parts = command.split(\":\")\n    move(int(parts[0]))\n    if parts[1] == \"on\":\n        press()",
+          "explanation": "先空格后冒号拆分；距离是字符串须转int，off时不按。",
+          "commonMistakes": [
+            "只拆空格没拆冒号",
+            "把off也按下"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+export const STORAGE_KEY='lucas-lab-python-exams-v1';
+const clone=x=>JSON.parse(JSON.stringify(x));
+export const emptyState=()=>({schema:1,papers:{}});
+export const remaining=(draft,now=Date.now())=>Math.max(0,Math.min(3600000,draft.startedAt+3600000-now));
+export const canSubmit=(draft,now=Date.now())=>now-draft.startedAt>=1800000;
+export function start(state,exam,now=Date.now()){const s=clone(state);const p=s.papers[exam.id]??={first:null,attempts:[],draft:null};if(!p.draft)p.draft={startedAt:now,answers:{},codes:Object.fromEntries(exam.tasks.map(t=>[t.id,t.starter||''])),runs:{},firstRuns:{}};return s;}
+function edit(state,id,now,fn){const s=clone(state),d=s.papers[id]?.draft;if(d&&remaining(d,now)>0)fn(d);return s;}
+export const setAnswer=(s,id,q,value,now=Date.now())=>edit(s,id,now,d=>{d.answers[q]=value;});
+export const setCode=(s,id,q,code,now=Date.now())=>edit(s,id,now,d=>{if(d.codes[q]!==code){d.codes[q]=code;delete d.runs[q];}});
+export const setRun=(s,id,q,result,code,now=Date.now())=>edit(s,id,now,d=>{if(d.codes[q]!==code)return;const r={code,result:clone(result),at:now};d.runs[q]=r;if(!d.firstRuns[q])d.firstRuns[q]=clone(r);});
+export function submit(state,exam,now=Date.now(),reason='manual'){const s=clone(state),p=s.papers[exam.id];if(!p?.draft||reason==='manual'&&!canSubmit(p.draft,now))return s;const a={...p.draft,submittedAt:Math.min(now,p.draft.startedAt+3600000),reason:remaining(p.draft,now)===0?'timeout':reason};p.attempts.push(a);if(!p.first)p.first=clone(a);p.draft=null;return s;}
+export function grade(exam,attempt,solutions){let score=0;const items={};for(const q of exam.choices){const correct=attempt.answers[q.id]===solutions.choices[q.id].answer;items[q.id]={points:correct?2:0,max:2,correct};score+=items[q.id].points;}for(const t of exam.tasks){const r=attempt.runs[t.id];const stars=r&&r.code===attempt.codes[t.id]?Math.max(0,Math.min(3,Number(r.result.stars)||0)):0;items[t.id]={stars,points:stars*7,max:21,correct:stars===3};score+=stars*7;}return {score,max:100,items};}
+const record=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const draftValid=d=>record(d)&&Number.isFinite(d.startedAt)&&d.startedAt>=0&&record(d.answers)&&Object.values(d.answers).every(n=>Number.isInteger(n)&&n>=0&&n<=3)&&record(d.codes)&&Object.values(d.codes).every(v=>typeof v==='string')&&record(d.runs)&&record(d.firstRuns)&&[d.runs,d.firstRuns].every(r=>Object.values(r).every(v=>record(v)&&typeof v.code==='string'&&record(v.result)&&Number.isInteger(v.result.stars)&&v.result.stars>=0&&v.result.stars<=3));
+const attemptValid=a=>draftValid(a)&&Number.isFinite(a.submittedAt)&&a.submittedAt>=a.startedAt&&a.submittedAt<=a.startedAt+3600000&&['manual','timeout'].includes(a.reason);
+export function load(storage){try{const raw=storage.getItem(STORAGE_KEY);if(raw===null)return {state:emptyState(),warning:''};const s=JSON.parse(raw);if(!record(s)||s.schema!==1||!record(s.papers)||!Object.entries(s.papers).every(([id,p])=>['A','B','C'].includes(id)&&record(p)&&Array.isArray(p.attempts)&&p.attempts.every(attemptValid)&&(p.first===null||attemptValid(p.first))&&(p.draft===null||draftValid(p.draft))&&Boolean(p.first)===Boolean(p.attempts.length)))throw Error();return {state:s,warning:''};}catch{return {state:emptyState(),warning:'本地记录损坏或存储不可用，无法恢复旧记录；请及时导出本次作答。'};}}
+export function save(storage,state){try{storage.setItem(STORAGE_KEY,JSON.stringify(state));return true;}catch{return false;}}

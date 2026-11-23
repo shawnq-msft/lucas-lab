@@ -1,0 +1,1125 @@
+{
+  "version": "1",
+  "notice": "自编模拟题，非官方真题；题数/分值/三星预算均为本练习设定",
+  "scope": [
+    "Python基础",
+    "计算机基础",
+    "关键字",
+    "输入输出",
+    "变量",
+    "常用内置函数",
+    "数据类型",
+    "算术/逻辑/比较/位运算",
+    "顺序/循环/分支",
+    "字符串切片与方法",
+    "列表切片与方法",
+    "字典创建与方法"
+  ],
+  "exams": [
+    {
+      "id": "A",
+      "title": "A卷 · 基础指令与数据",
+      "minutes": 60,
+      "choices": [
+        {
+          "id": "q1",
+          "title": "输入设备",
+          "prompt": "下列哪一个主要用于向计算机输入信息？",
+          "options": [
+            "显示器",
+            "键盘",
+            "音箱",
+            "投影仪"
+          ],
+          "topic": "计算机基础"
+        },
+        {
+          "id": "q2",
+          "title": "识别关键字",
+          "prompt": "下列哪一个是 Python 关键字？",
+          "options": [
+            "score",
+            "move",
+            "for",
+            "total"
+          ],
+          "topic": "关键字"
+        },
+        {
+          "id": "q3",
+          "title": "变量更新",
+          "prompt": "程序输出什么？",
+          "options": [
+            "5 5",
+            "3 3",
+            "5 3",
+            "3 5"
+          ],
+          "topic": "变量",
+          "code": "a = 3\nb = a\na = a + 2\nprint(a, b)"
+        },
+        {
+          "id": "q4",
+          "title": "整除与余数",
+          "prompt": "程序输出什么？",
+          "options": [
+            "3 2",
+            "3.4 2",
+            "2 3",
+            "4 0"
+          ],
+          "topic": "算术/逻辑/比较/位运算",
+          "code": "print(17 // 5, 17 % 5)"
+        },
+        {
+          "id": "q5",
+          "title": "读入数字",
+          "prompt": "输入一行 8，程序输出什么？",
+          "options": [
+            "82",
+            "10",
+            "8",
+            "程序报错"
+          ],
+          "topic": "输入输出",
+          "code": "n = int(input())\nprint(n + 2)",
+          "stdin": "8"
+        },
+        {
+          "id": "q6",
+          "title": "字符串窗口",
+          "prompt": "程序输出什么？",
+          "options": [
+            "YH",
+            "YT",
+            "PTO",
+            "YTO"
+          ],
+          "topic": "字符串切片与方法",
+          "code": "s = 'PYTHON'\nprint(s[1:5:2])"
+        },
+        {
+          "id": "q7",
+          "title": "循环累加",
+          "prompt": "程序输出什么？",
+          "options": [
+            "3",
+            "4",
+            "6",
+            "10"
+          ],
+          "topic": "顺序/循环/分支",
+          "code": "total = 0\nfor n in range(1, 4):\n    total += n\nprint(total)"
+        },
+        {
+          "id": "q8",
+          "title": "列表插入",
+          "prompt": "程序输出什么？",
+          "options": [
+            "2 6",
+            "3 4",
+            "3 6",
+            "6 3"
+          ],
+          "topic": "列表切片与方法",
+          "code": "a = [2, 4]\na.append(6)\nprint(len(a), a[-1])"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "t1",
+          "title": "卢克的补给站",
+          "topic": "顺序/循环/分支",
+          "goal": "自编模拟：hero保持(0,2)；luke到(2,0)，消灭(7,0)敌人并按(2,0)开关。方向0为东；按顺序完成。",
+          "starter": "# A1：先看两个角色的位置\n# 用 advance 和 retreat 给 luke 发指令\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "advance": 6,
+            "retreat": -4
+          },
+          "budget": 4,
+          "required": "sequence",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 2,
+                "direction": 0
+              },
+              {
+                "name": "luke",
+                "x": 0,
+                "y": 0,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 0,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [
+              {
+                "x": 7,
+                "y": 0,
+                "active": true
+              }
+            ],
+            "walls": [
+              [
+                4,
+                1
+              ]
+            ],
+            "endpoints": {
+              "hero": [
+                0,
+                2
+              ],
+              "luke": [
+                2,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "t2",
+          "title": "三段亮灯路",
+          "topic": "顺序/循环/分支",
+          "goal": "自编模拟：依次走steps中每段距离并按脚下开关；hero最终(6,1)。要求使用for。",
+          "starter": "# A2：steps 已提供\n# 每段移动后点亮开关\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "steps": [
+              2,
+              2,
+              2
+            ]
+          },
+          "budget": 6,
+          "required": "for",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 4,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 6,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                6,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "t3",
+          "title": "巡检计数器",
+          "topic": "顺序/循环/分支",
+          "goal": "自编模拟：按distances依次移动并按三个开关，终点(4,1)。要求while，用索引逐个读取。",
+          "starter": "# A3：while 的终止条件要能变化\ni = 0\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "distances": [
+              1,
+              2,
+              1
+            ]
+          },
+          "budget": 6,
+          "required": "while",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 1,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 3,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 4,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                4,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "t4",
+          "title": "不能误触的门",
+          "topic": "顺序/循环/分支",
+          "goal": "自编模拟：按records逐段移动，只在open为True时按开关；(4,1)禁止按，终点(6,1)。要求if。",
+          "starter": "# A4：False 开关不要按\n# 读取 records 中 steps 与 open\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "records": [
+              {
+                "steps": 2,
+                "open": true
+              },
+              {
+                "steps": 2,
+                "open": false
+              },
+              {
+                "steps": 2,
+                "open": true
+              }
+            ]
+          },
+          "budget": 5,
+          "required": "if",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 4,
+                "y": 1,
+                "pressed": false,
+                "required": false
+              },
+              {
+                "x": 6,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                6,
+                1
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "title": "B卷 · 循环处理与容器",
+      "minutes": 60,
+      "choices": [
+        {
+          "id": "q1",
+          "title": "网络安全",
+          "prompt": "收到索要比赛账号密码的陌生链接，最合适的做法是什么？",
+          "options": [
+            "立即输入账号密码",
+            "把密码转发给同学",
+            "断开可疑链接，向老师报告",
+            "下载陌生附件验证"
+          ],
+          "topic": "计算机基础"
+        },
+        {
+          "id": "q2",
+          "title": "区分数据类型",
+          "prompt": "程序输出什么？",
+          "options": [
+            "int str",
+            "str int",
+            "str str",
+            "int int"
+          ],
+          "topic": "数据类型",
+          "code": "a = '7'\nb = 7\nprint(type(a).__name__, type(b).__name__)"
+        },
+        {
+          "id": "q3",
+          "title": "列表窗口",
+          "prompt": "程序输出什么？",
+          "options": [
+            "[3, 5, 7]",
+            "[1, 3, 5, 7]",
+            "[3, 5, 7, 9]",
+            "[1, 5, 9]"
+          ],
+          "topic": "列表切片与方法",
+          "code": "a = [1, 3, 5, 7, 9]\nprint(a[1:4])"
+        },
+        {
+          "id": "q4",
+          "title": "逻辑短句",
+          "prompt": "程序输出什么？",
+          "options": [
+            "False",
+            "4",
+            "True",
+            "5"
+          ],
+          "topic": "算术/逻辑/比较/位运算",
+          "code": "x = 4\nprint(x > 2 and not x == 5)"
+        },
+        {
+          "id": "q5",
+          "title": "字典默认值",
+          "prompt": "程序输出什么？",
+          "options": [
+            "0 2",
+            "1 3",
+            "1 2",
+            "green 2"
+          ],
+          "topic": "字典创建与方法",
+          "code": "d = {'red': 2, 'blue': 4}\nprint(d.get('green', 1), len(d))"
+        },
+        {
+          "id": "q6",
+          "title": "字符串清理",
+          "prompt": "程序输出什么？",
+          "options": [
+            "['go', 'stop']",
+            "['  go', 'stop  ']",
+            "go stop",
+            "['g', 'o']"
+          ],
+          "topic": "字符串切片与方法",
+          "code": "s = '  go,stop  '\nprint(s.strip().split(','))"
+        },
+        {
+          "id": "q7",
+          "title": "while 次数",
+          "prompt": "程序输出什么？",
+          "options": [
+            "1 2",
+            "0 3",
+            "3 1",
+            "1 3"
+          ],
+          "topic": "顺序/循环/分支",
+          "code": "n = 7\nc = 0\nwhile n > 1:\n    n //= 2\n    c += 1\nprint(n, c)"
+        },
+        {
+          "id": "q8",
+          "title": "内置函数组合",
+          "prompt": "程序输出什么？",
+          "options": [
+            "4 1 8",
+            "1 4 3",
+            "1 4 8",
+            "1 3 8"
+          ],
+          "topic": "常用内置函数",
+          "code": "a = [4, 1, 3]\nprint(min(a), max(a), sum(a))"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "t1",
+          "title": "切片密码带",
+          "topic": "字符串切片与方法",
+          "goal": "自编模拟：tape首尾是护套，取中间数字逐个转int作距离；走完每段按开关，终点(8,1)。要求切片。",
+          "starter": "# B1：护套不参与移动\n# 使用 tape 的切片\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "tape": "x224z"
+          },
+          "budget": 6,
+          "required": "slice",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 4,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 8,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                8,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "t2",
+          "title": "倒序货架",
+          "topic": "列表切片与方法",
+          "goal": "自编模拟：route两端9为护栏编号，不走；取中间列表，再reverse倒序遍历，每段按开关，终点(6,1)。要求切片。",
+          "starter": "# B2：先复制中间部分，再原地倒序\n# 不要把 reverse() 的返回值当列表\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "route": [
+              9,
+              1,
+              2,
+              3,
+              9
+            ]
+          },
+          "budget": 6,
+          "required": "slice",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 3,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 5,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 6,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                6,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "t3",
+          "title": "缺键备用桥",
+          "topic": "字典创建与方法",
+          "goal": "自编模拟：按order读lengths；缺键默认走1格，每段按开关；终点(6,1)。要求字典get方法。",
+          "starter": "# B3：missing 没有键值\n# 用 lengths.get 的默认值\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "lengths": {
+              "red": 2,
+              "blue": 3
+            },
+            "order": [
+              "red",
+              "missing",
+              "blue"
+            ]
+          },
+          "budget": 6,
+          "required": "dict",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 3,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 6,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                6,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "t4",
+          "title": "字符巡逻车",
+          "topic": "字符串切片与方法",
+          "goal": "自编模拟：逐字符读commands；M走1格，P按脚下开关；hero终点(4,1)。要求while。",
+          "starter": "# B4：M / P 的意义由本模拟器定义\ni = 0\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "commands": "MMPMM"
+          },
+          "budget": 5,
+          "required": "while",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                4,
+                1
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "title": "C卷 · 组合判断与双角色",
+      "minutes": 60,
+      "choices": [
+        {
+          "id": "q1",
+          "title": "内存与存储",
+          "prompt": "关于普通计算机的内存，下列哪项正确？",
+          "options": [
+            "内存中的数据断电后通常丢失",
+            "内存就是键盘",
+            "内存只能存图片",
+            "内存是永久备份"
+          ],
+          "topic": "计算机基础"
+        },
+        {
+          "id": "q2",
+          "title": "缩进与分支",
+          "prompt": "程序输出什么？",
+          "options": [
+            "大\n结束",
+            "小",
+            "小\n结束",
+            "结束"
+          ],
+          "topic": "Python基础",
+          "code": "x = 2\nif x > 3:\n    print(\"大\")\nelse:\n    print(\"小\")\nprint(\"结束\")"
+        },
+        {
+          "id": "q3",
+          "title": "浮点与整数",
+          "prompt": "程序输出什么？",
+          "options": [
+            "4 4",
+            "4.5 4",
+            "4.5 4.5",
+            "5 4"
+          ],
+          "topic": "数据类型",
+          "code": "print(9 / 2, 9 // 2)"
+        },
+        {
+          "id": "q4",
+          "title": "位标志",
+          "prompt": "程序输出什么？",
+          "options": [
+            "2 5 4",
+            "3 4 2",
+            "6 5 2",
+            "2 4 4"
+          ],
+          "topic": "算术/逻辑/比较/位运算",
+          "code": "print(6 & 3, 4 | 1, 1 << 2)"
+        },
+        {
+          "id": "q5",
+          "title": "字符串逆序",
+          "prompt": "程序输出什么？",
+          "options": [
+            "ABCDE",
+            "edcba",
+            "EDCBA",
+            "ACE"
+          ],
+          "topic": "字符串切片与方法",
+          "code": "s = 'abcde'\nprint(s[::-1].upper())"
+        },
+        {
+          "id": "q6",
+          "title": "列表别名",
+          "prompt": "程序输出什么？",
+          "options": [
+            "2 2",
+            "3 3",
+            "2 3",
+            "3 2"
+          ],
+          "topic": "列表切片与方法",
+          "code": "a = [1, 2]\nb = a\nc = a[:]\nb.append(3)\nprint(len(a), len(c))"
+        },
+        {
+          "id": "q7",
+          "title": "字典更新",
+          "prompt": "程序输出什么？",
+          "options": [
+            "5",
+            "6",
+            "3",
+            "程序报错"
+          ],
+          "topic": "字典创建与方法",
+          "code": "d = dict(a=2)\nd.update({'b': 3})\nd['a'] += 1\nprint(d['a'] + d['b'])"
+        },
+        {
+          "id": "q8",
+          "title": "continue 的作用",
+          "prompt": "程序输出什么？",
+          "options": [
+            "10",
+            "2",
+            "8",
+            "6"
+          ],
+          "topic": "关键字",
+          "code": "s = 0\nfor i in range(5):\n    if i == 2:\n        continue\n    s += i\nprint(s)"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "t1",
+          "title": "双人拐角会合",
+          "topic": "顺序/循环/分支",
+          "goal": "自编模拟：hero走东2、南2、西1，按(1,2)；luke从(0,4)走东3、北2，按(3,2)。两人都须到指定终点，禁止穿墙。",
+          "starter": "# C1：朝向0东、1南、2西、3北\n# hero 和 luke 的位置/方向独立\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "heroEast": 2,
+            "heroSouth": 2,
+            "heroWest": 1,
+            "lukeEast": 3,
+            "lukeNorth": 2
+          },
+          "budget": 10,
+          "required": "sequence",
+          "scenario": {
+            "width": 6,
+            "height": 5,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 0,
+                "direction": 0
+              },
+              {
+                "name": "luke",
+                "x": 0,
+                "y": 4,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 1,
+                "y": 2,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 3,
+                "y": 2,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                4,
+                3
+              ]
+            ],
+            "endpoints": {
+              "hero": [
+                1,
+                2
+              ],
+              "luke": [
+                3,
+                2
+              ]
+            }
+          }
+        },
+        {
+          "id": "t2",
+          "title": "二进制通行灯",
+          "topic": "算术/逻辑/比较/位运算",
+          "goal": "自编模拟：每轮走steps[i]；flags[i]最低位为1时才按；(3,1)禁止按，终点(5,1)。要求if。",
+          "starter": "# C2：最低位用 & 1 检查\n# steps 与 flags 一一对应\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "steps": [
+              2,
+              1,
+              2
+            ],
+            "flags": [
+              1,
+              0,
+              3
+            ]
+          },
+          "budget": 5,
+          "required": "if",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 3,
+                "y": 1,
+                "pressed": false,
+                "required": false
+              },
+              {
+                "x": 5,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                5,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "t3",
+          "title": "修订运送清单",
+          "topic": "列表切片与方法",
+          "goal": "自编模拟：先向route尾部append(extra)，再pop(0)删除首项；按新清单移动，每段按开关，终点(5,1)。要求列表方法。",
+          "starter": "# C3：修改 route 后再出发\n# append 与 pop 的返回值不同\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "route": [
+              1,
+              2
+            ],
+            "extra": 3
+          },
+          "budget": 4,
+          "required": "list",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 5,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                5,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "t4",
+          "title": "广播指令解析",
+          "topic": "字符串切片与方法",
+          "goal": "自编模拟：text按空格分段；每段按冒号拆成距离与状态；移动后只为on按开关，终点(5,1)，(3,1)禁止按。要求for。",
+          "starter": "# C4：先分段，再分字段\n# text 的全部输入均可见\n",
+          "api": [
+            "move(n)：沿朝向走n格，负数后退；不能穿墙、越界或穿过活跃敌人。",
+            "turnLeft() / turnRight()：左/右转90度。",
+            "attack()：仅攻击正前方相邻活跃敌人；空击失败。",
+            "press()：仅按脚下 required=true 的未按开关；误按或重复按失败。",
+            "全局方法操作hero；hero与luke对象只能操作地图中同名角色；仅提供上述五种动作。"
+          ],
+          "inputs": {
+            "text": "2:on 1:off 2:on"
+          },
+          "budget": 5,
+          "required": "for",
+          "scenario": {
+            "width": 10,
+            "height": 3,
+            "actors": [
+              {
+                "name": "hero",
+                "x": 0,
+                "y": 1,
+                "direction": 0
+              }
+            ],
+            "switches": [
+              {
+                "x": 2,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              },
+              {
+                "x": 3,
+                "y": 1,
+                "pressed": false,
+                "required": false
+              },
+              {
+                "x": 5,
+                "y": 1,
+                "pressed": false,
+                "required": true
+              }
+            ],
+            "enemies": [],
+            "walls": [],
+            "endpoints": {
+              "hero": [
+                5,
+                1
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

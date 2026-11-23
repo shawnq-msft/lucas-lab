@@ -33,6 +33,8 @@ jobs:
           python3 -m unittest discover -s tests -p test_camp101_content.py -v
           python3 -m unittest discover -s tests -p test_school_admissions.py -v
           node --test tests/camp101.test.mjs
+          node --test tests/python_exams.test.mjs
+          python3 -m unittest discover -s tests -p test_python_exams.py -v
           python3 -m unittest discover -s tests -p test_mali_content.py -v
           python3 -m unittest discover -s tests -p test_creative.py -v
           python3 -m unittest discover -s tests -p test_robotics.py -v
@@ -61,6 +63,7 @@ jobs:
           python3 tests/robotics_browser.py
           python3 tests/courses_browser.py
           python3 tests/home_browser.py
+          python3 tests/python_exams_browser.py
       - uses: actions/configure-pages@v5
       - name: Stage public site only
         run: |
@@ -71,6 +74,7 @@ jobs:
           cp -r mali _site/
           cp -r creative _site/
           cp -r camp101 _site/
+          cp -r python-exams _site/
           cp -r school-admissions _site/
           cp -r robotics _site/
           cp -r courses _site/
